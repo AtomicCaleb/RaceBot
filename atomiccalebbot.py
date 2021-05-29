@@ -22,13 +22,26 @@ SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly']
 
 
 # The ID and range of a sample spreadsheet.
-SAMPLE_SPREADSHEET_ID = '1HB6LujCo6R2XeIVrWYdAZ8gQkA7qWrTF9QQlAWblizY'
+
 SAMPLE_RANGE_NAME = 'A2:E'
 
-prodChannel = 847495184660955146
+sharcordChannel = 847495184660955146
 testChannel = 382486010417643530
+chessChannel = 827714631714734160
+
+testSheet = '1IM24hRS_giIC5OcNNGBrHfwIZpbOcUyUURgt-q4913w'
+sharcordSheet = '1HB6LujCo6R2XeIVrWYdAZ8gQkA7qWrTF9QQlAWblizY'
+
+class race:
+    raceData = ''
+    raceTime = time.gmtime
+    messageID = 0
 
 #####################FUNCTIONS################################
+
+def GetRaceTime(timeString):
+    dateTimeFormat = '%d/%m/%y | %H:%M%P %Z'
+    return datetime.strptime(timeString, dateTimeFormat)
 
 def WriteRacesToFile():
     with open('Races.txt', 'w') as f:
@@ -61,7 +74,7 @@ def GetRaceData():
 
     # Call the Sheets API
     sheet = service.spreadsheets()
-    result = sheet.values().get(spreadsheetId=SAMPLE_SPREADSHEET_ID,
+    result = sheet.values().get(spreadsheetId=testSheet,
                                 range=SAMPLE_RANGE_NAME).execute()
     values = result.get('values', [])
     RaceData = ['']
@@ -115,9 +128,10 @@ load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 
 client = discord.Client()
+#client.run(TOKEN)
 
 async def func():
-    while(True):    
+    while(True):
         CompareRaces()
         global Races
         Races = GetRaceData()
@@ -137,8 +151,8 @@ def chunks(s, n):
         
 @client.event
 async def on_ready():
-    await func();
     print(f'{client.user} has connected to Discord!')
+    await func();
 
 @client.event
 async def on_message(message):
@@ -148,6 +162,5 @@ async def on_message(message):
     if message.content.startswith('races'):
         for chunk in chunks(RACEDATA, 2000):
             await message.channel.send(chunk)
+
 client.run(TOKEN)
-
-
