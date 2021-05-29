@@ -21,21 +21,32 @@ import time
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly']
 
 
-# The ID and range of a sample spreadsheet.
-
-SAMPLE_RANGE_NAME = 'A2:E'
-
-sharcordChannel = 847495184660955146
-testChannel = 382486010417643530
-chessChannel = 827714631714734160
-
-testSheet = '1IM24hRS_giIC5OcNNGBrHfwIZpbOcUyUURgt-q4913w'
-sharcordSheet = '1HB6LujCo6R2XeIVrWYdAZ8gQkA7qWrTF9QQlAWblizY'
-
+#race data stuff
 class race:
     raceData = ''
     raceTime = time.gmtime
     messageID = 0
+
+sharcordRaces = ''
+chessRaces = ''
+
+sharcordTxtFile = 'sharcordRaces.txt'
+chessTxtFile = 'chessRaces.txt'
+
+# The ID and range of a sample spreadsheet.
+SAMPLE_RANGE_NAME = 'A2:E'
+
+#channels
+sharcordChannel = 847495184660955146
+chessChannel = 827714631714734160
+testChannel = 382486010417643530
+testChannelTwo = 848165475925229568
+
+#google sheets
+testSheet = '1IM24hRS_giIC5OcNNGBrHfwIZpbOcUyUURgt-q4913w'
+sharcordSheet = '1HB6LujCo6R2XeIVrWYdAZ8gQkA7qWrTF9QQlAWblizY'
+chessSheet = '1QAFp_BOB1j_0v_8S6ubhAITvKZru0mcZv_amgvpbbYc'
+
 
 #####################FUNCTIONS################################
 
@@ -43,15 +54,16 @@ def GetRaceTime(timeString):
     dateTimeFormat = '%d/%m/%y | %H:%M%P %Z'
     return datetime.strptime(timeString, dateTimeFormat)
 
-def WriteRacesToFile():
-    with open('Races.txt', 'w') as f:
-        for race in Races:
+def WriteRacesToFile(races, fileName):
+    with open(fileName, 'w') as f:
+        for race in races:
             f.write(race)
 
-def GetRaceData():
+def GetRaceData(sheet, hasCategory):
     """Shows basic usage of the Sheets API.
     Prints values from a sample spreadsheet.
     """
+    sheetToUse = sheet
     creds = None
     # The file token.json stores the user's access and refresh tokens, and is
     # created automatically when the authorization flow completes for the first
@@ -74,32 +86,61 @@ def GetRaceData():
 
     # Call the Sheets API
     sheet = service.spreadsheets()
-    result = sheet.values().get(spreadsheetId=testSheet,
+    result = sheet.values().get(spreadsheetId=sheetToUse,
                                 range=SAMPLE_RANGE_NAME).execute()
     values = result.get('values', [])
     RaceData = ['']
     if not values:
         print('No data found.')
     else:
+        dateTime = 0
+        category = 1
+        runnerOne = 2
+        runnerTwo = 4
+        if not hasCategory:
+            runnerOne -= 1
+            runnerTwo -= 1
+
         for row in values:
-            runnerTwoRow = 4
+        #if there isnt enoughdata dont bother
             if len(row) < 3:
-                continue;
-            elif len(row) < 4:
-                runnerTwoRow = 3         
-        # Print columns A and E, which correspond to indices 0 and 4.
-            if row[0] and row[1] and row[2] and row[runnerTwoRow]:
-                data = row[0] + ',' + row[1] + ',' + row[2] +',' + row[runnerTwoRow] + '\n'
-                RaceData.append(data)
+                continue
+            if len(row) < 4:
+                runnerTwo -= 1
+
+            if hasCategory:
+                if row[dateTime] and row[category] and row[runnerOne] and row[runnerTwo]:
+                    data = row[dateTime] + ',' + row[category] + ',' + row[runnerOne] +',' + row[runnerTwo] + '\n'
+                    RaceData.append(data)
+            else:
+                if row[dateTime] and row[category] and row[runnerOne] and row[runnerTwo]:
+                    data = row[dateTime] +',' + row[runnerOne] +',' + row[runnerTwo] + '\n'
+                    RaceData.append(data)
     return RaceData
 
-def CompareRaces():
-    with open('Races.txt') as f:
+def GetMessageString(raceInfo, added, hasCategory, chess):
+     raceString = ''
+     raceInfoList = raceInfo.split(',')
+
+     headerPart = '**New Race Scheduled**' if added else '**Race Removed**'
+     raceString += headerPart 
+     raceString += '\n Date/Time:' + raceInfoList[0]
+     if hasCategory:
+        raceString += '\n Category: %s \n Racers: %s VS %s\n' % (raceInfoList[1], raceInfoList[2], raceInfoList[3])
+     elif not chess:
+        raceString += '\n Category: ASM \n Racers: %s VS %s\n' % (raceInfoList[1], raceInfoList[2])
+     else:
+        raceString += '\n Racers: %s VS %s\n' % (raceInfoList[1], raceInfoList[2])
+         
+     return raceString
+
+
+def CompareRaces(sheet, txtFile, hasCategory, chess):
+    with open(txtFile) as f:
         fileRaces = f.readlines()
-    raceData = GetRaceData()
+    raceData = GetRaceData(sheet, hasCategory)
     i = 0
-    
-    global NEWRACES
+
     NEWRACES = ''
    
     for sheetsRace in raceData:
@@ -107,20 +148,16 @@ def CompareRaces():
             continue
         found = sheetsRace in fileRaces
         if not found:
-            print(sheetsRace)
-            raceInfo = sheetsRace.split(',')
-            NEWRACES += '**New Race Scheduled**\n Date/Time: %s\n Category: %s' % (raceInfo[0], raceInfo[1])
-            NEWRACES += '\n Racers: %s VS %s\n' % (raceInfo[2], raceInfo[3])
+            NEWRACES = GetMessageString(sheetsRace, True, hasCategory, chess)
          
     for fileRace in fileRaces:
         found = fileRace in raceData
         if not found:
-            raceInfo = fileRace.split(',')
-            NEWRACES += '**Race Removed**\n Date/Time: %s\n Category: %s' % (raceInfo[0], raceInfo[1])
-            NEWRACES += '\n Racers: %s VS %s\n' % (raceInfo[2], raceInfo[3])
+            NEWRACES = GetMessageString(fileRace, False, hasCategory, chess)
     if len(NEWRACES) == 0:
         NEWRACES = ''
         #NEWRACES = 'No New Races'
+    return NEWRACES
 
 ########################ACTUAL CODE##############################
 
@@ -130,21 +167,25 @@ TOKEN = os.getenv('DISCORD_TOKEN')
 client = discord.Client()
 #client.run(TOKEN)
 
-async def func():
+async def CheckRaces(sheet, txtFile, channel, hasCategory, chess):
+    changes = CompareRaces(sheet, txtFile, hasCategory, chess)
+    races = GetRaceData(sheet, hasCategory)
+    WriteRacesToFile(races, txtFile)
+    if len(changes) != 0:
+        for chunk in Chunks(changes, 2000):
+            print(chunk)
+            await client.get_channel(channel).send(chunk)
+    else:
+        print('no new races for ' + txtFile)
+
+async def Main():
     while(True):
-        CompareRaces()
-        global Races
-        Races = GetRaceData()
-        WriteRacesToFile()
-        if len(NEWRACES) != 0:
-            for chunk in chunks(NEWRACES, 2000):
-            	await client.get_channel(testChannel).send(chunk)
-        else:
-            print('no new races')
+        await CheckRaces(testSheet, sharcordTxtFile, testChannel, True, False)
+        await CheckRaces(chessSheet, chessTxtFile, testChannelTwo, False, True)
         time.sleep(15)
 
 
-def chunks(s, n):
+def Chunks(s, n):
     """Produce `n`-character chunks from `s`."""
     for start in range(0, len(s), n):
         yield s[start:start+n]
@@ -152,15 +193,15 @@ def chunks(s, n):
 @client.event
 async def on_ready():
     print(f'{client.user} has connected to Discord!')
-    await func();
+    await Main();
 
 @client.event
 async def on_message(message):
     if message.author == client.user:
        return
-    print(message.content);
+    print(message.author + ':' + message.content);
     if message.content.startswith('races'):
-        for chunk in chunks(RACEDATA, 2000):
+        for chunk in Chunks(RACEDATA, 2000):
             await message.channel.send(chunk)
 
 client.run(TOKEN)
