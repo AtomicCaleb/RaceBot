@@ -22,13 +22,13 @@ SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly']
 
 
 #race data stuff
-class race:
-    raceData = ''
+class Race:
+    data = ''
     raceTime = time.gmtime
     messageID = 0
 
-sharcordRaces = ''
-chessRaces = ''
+sharcordRaces = []
+chessRaces = []
 
 sharcordTxtFile = 'sharcordRaces.txt'
 chessTxtFile = 'chessRaces.txt'
@@ -57,7 +57,7 @@ def GetRaceTime(timeString):
 def WriteRacesToFile(races, fileName):
     with open(fileName, 'w') as f:
         for race in races:
-            f.write(race)
+            f.write(race.data)
 
 def GetRaceData(sheet, hasCategory):
     """Shows basic usage of the Sheets API.
@@ -89,7 +89,7 @@ def GetRaceData(sheet, hasCategory):
     result = sheet.values().get(spreadsheetId=sheetToUse,
                                 range=SAMPLE_RANGE_NAME).execute()
     values = result.get('values', [])
-    RaceData = ['']
+    raceDatas = []
     if not values:
         print('No data found.')
     else:
@@ -103,6 +103,7 @@ def GetRaceData(sheet, hasCategory):
 
         for row in values:
         #if there isnt enoughdata dont bother
+            raceData = Race()
             if len(row) < 3:
                 continue
             if len(row) < 4:
@@ -111,12 +112,14 @@ def GetRaceData(sheet, hasCategory):
             if hasCategory:
                 if row[dateTime] and row[category] and row[runnerOne] and row[runnerTwo]:
                     data = row[dateTime] + ',' + row[category] + ',' + row[runnerOne] +',' + row[runnerTwo] + '\n'
-                    RaceData.append(data)
+                    raceData.data = data
             else:
                 if row[dateTime] and row[category] and row[runnerOne] and row[runnerTwo]:
                     data = row[dateTime] +',' + row[runnerOne] +',' + row[runnerTwo] + '\n'
-                    RaceData.append(data)
-    return RaceData
+                    raceData.data = data
+
+            raceDatas.append(raceData)
+    return raceDatas
 
 def GetMessageString(raceInfo, added, hasCategory, chess):
      raceString = ''
@@ -135,25 +138,27 @@ def GetMessageString(raceInfo, added, hasCategory, chess):
      return raceString
 
 
-def CompareRaces(sheet, txtFile, hasCategory, chess):
+def CompareRaces(races, txtFile, hasCategory, chess):
     with open(txtFile) as f:
         fileRaces = f.readlines()
-    raceData = GetRaceData(sheet, hasCategory)
-    i = 0
+    raceDataStrings = []
+    for race in races:
+        raceDataStrings.append(race.data)
 
+    i = 0
     NEWRACES = ''
    
-    for sheetsRace in raceData:
-        if(len(sheetsRace)) == 0:
+    for race in races:
+        if len(race.data) == 0:
             continue
-        found = sheetsRace in fileRaces
+        found = race.data in fileRaces
         if not found:
-            NEWRACES = GetMessageString(sheetsRace, True, hasCategory, chess)
+            NEWRACES += GetMessageString(race.data, True, hasCategory, chess)
          
     for fileRace in fileRaces:
-        found = fileRace in raceData
+        found = fileRace in raceDataStrings
         if not found:
-            NEWRACES = GetMessageString(fileRace, False, hasCategory, chess)
+            NEWRACES += GetMessageString(fileRace, False, hasCategory, chess)
     if len(NEWRACES) == 0:
         NEWRACES = ''
         #NEWRACES = 'No New Races'
@@ -168,7 +173,7 @@ client = discord.Client()
 #client.run(TOKEN)
 
 async def CheckRaces(sheet, txtFile, channel, hasCategory, chess):
-    changes = CompareRaces(sheet, txtFile, hasCategory, chess)
+    changes = CompareRaces(races, txtFile, hasCategory, chess)
     races = GetRaceData(sheet, hasCategory)
     WriteRacesToFile(races, txtFile)
     if len(changes) != 0:
@@ -177,11 +182,24 @@ async def CheckRaces(sheet, txtFile, channel, hasCategory, chess):
             await client.get_channel(channel).send(chunk)
     else:
         print('no new races for ' + txtFile)
+    return races
+
+async def CheckSharcordRaces():
+    sharcordRaces = CheckRaces(sharcordSheet, sharcordTxtFile, sharcordChannel, True, False)
+
+async def CheckTestSharcordRaces():
+    sharcordRaces = CheckRaces(testSheet, sharcordTxtFile, testChannel, True, False)
+
+async def CheckChessRaces():
+    chessRaces = CheckRaces(chessSheet, chessTxtFile, chessChannel, False, True)
+
+async def CheckTestChessRaces():
+    chessRaces = CheckRaces(chessSheet, chessTxtFile, testChannelTwo, False, True)
 
 async def Main():
     while(True):
-        await CheckRaces(testSheet, sharcordTxtFile, testChannel, True, False)
-        await CheckRaces(chessSheet, chessTxtFile, testChannelTwo, False, True)
+        await CheckTestSharcordRaces()
+        await CheckTestChessRaces()
         time.sleep(15)
 
 
