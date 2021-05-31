@@ -27,23 +27,29 @@ SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly']
 class Race:
     data = ''
     raceTime = time.gmtime
-    messageData = ''
     row = 0
     commentators = []
 
 sharcordRaces = []
 chessRaces = []
 
+raceMessages = {}
+
 #text files
 sharcordTxtFile = 'sharcordRaces.txt'
+sharcordExtrasTxtFile = 'sharcordRaceExtras.txt'
+
 sharcordTestTxtFile = 'testSharcordRaces.txt'
+
 chessTxtFile = 'chessRaces.txt'
+chessExtrasTxtFile = 'chessRaceExtras.txt'
+
 chessTestTxtFile = 'testChessRaces.txt'
 
 
 # The ID and range of a sample spreadsheet.
 raceDataSampleRange = 'A2:E'
-commentatorsSampleRange = 'F2:G'
+commentatorsSampleRange = 'A2:G'
 
 #channels
 sharcordChannel = 847495184660955146
@@ -66,7 +72,18 @@ def GetRaceTime(timeString):
 def WriteRacesToFile(races, fileName):
     with open(fileName, 'w') as f:
         for race in races:
-            f.write(race.data)
+            f.write(race.data + '\n')
+
+def WriteExtrasToFile(races, fileName):
+    with open(fileName, 'w') as f:
+        for race in races:
+            if race.commentators:
+                print(race.commentators)
+            commentators = race.data
+            for commentator in race.commentators:
+                commentators += '|' + commentator
+            commentators += '\n'
+            f.write(commentators)
 
 def GetSheet(sheetToUse, sampleRange):
     """Shows basic usage of the Sheets API.
@@ -97,9 +114,15 @@ def GetSheet(sheetToUse, sampleRange):
                                 range=sampleRange).execute()
     return result.get('values', [])
 
-def GetRaceData(sheet, hasCategory):
+def GetRaceData(sheet, extrasTxtFile, hasCategory):
     values = GetSheet(sheet, raceDataSampleRange)
     raceDatas = []
+
+        #read the coms from file
+    extrasData = ()
+    with open(extrasTxtFile) as f:
+        extrasData = f.readlines()
+    
     if not values:
         print('No data found.')
     else:
@@ -127,14 +150,31 @@ def GetRaceData(sheet, hasCategory):
             #add the data based on hasCategory
             if hasCategory:
                 if row[dateTime] and row[category] and row[runnerOne] and row[runnerTwo]:
-                    data = row[dateTime] + ',' + row[category] + ',' + row[runnerOne] +',' + row[runnerTwo] + '\n'
+                    data = row[dateTime] + ',' + row[category] + ',' + row[runnerOne] +',' + row[runnerTwo]
                     raceData.data = data
                     raceData.row = values.index(row)
+                    #check if a coms row is the same
+                    if len(extrasData) == 1:
+                        continue
+                    for comsData in extrasData:
+                        comsData = data.split('|')
+                        if comsData[0] == data:
+                            for i in range(len(comsData) - 1):
+                                raceData.commentators.append(comsData[i+1])
+
             else:
                 if row[dateTime] and row[category] and row[runnerOne] and row[runnerTwo]:
-                    data = row[dateTime] +',' + row[runnerOne] +',' + row[runnerTwo] + '\n'
+                    data = row[dateTime] +',' + row[runnerOne] +',' + row[runnerTwo]
                     raceData.data = data
                     raceData.row = values.index(row)
+                    #check if a coms row is the same
+                    if len(extrasData) == 1:
+                        continue
+                    for comsData in extrasData:
+                        comsData = data.split('|')
+                        if comsData[0] == data:
+                            for i in range(len(comsData) - 1):
+                                raceData.commentators.append(comsData[i+1])
 
             raceDatas.append(raceData)
     return raceDatas
@@ -149,9 +189,9 @@ def GetMessageString(raceInfo, added, hasCategory, chess):
      raceString += headerPart 
      raceString += '\n Date/Time: ' + raceInfoList[0]
      if hasCategory:
-        raceString += '\n Category: %s \n Racers: %s VS %s Commentators: \n Restreamer: \n' % (raceInfoList[1], raceInfoList[2], raceInfoList[3])
+        raceString += '\n Category: %s \n Racers: %s VS %s\n Commentators: \n Restreamer: \n' % (raceInfoList[1], raceInfoList[2], raceInfoList[3])
      elif not chess:
-        raceString += '\n Tournament Race \n Racers: %s VS %s Commentators: \n Restreamer: \n' % (raceInfoList[1], raceInfoList[2])
+        raceString += '\n Tournament Race \n Racers: %s VS %s\n Commentators: \n Restreamer: \n' % (raceInfoList[1], raceInfoList[2])
      else:
         raceString += '\n Racers: %s VS %s Commentators: \n Restreamer: \n' % (raceInfoList[1], raceInfoList[2])
          
@@ -166,7 +206,7 @@ def CompareRaces(races, txtFile, hasCategory, chess):
     raceDataStrings = []
     #get the info data
     for race in races:
-        raceDataStrings.append(race.data)
+        raceDataStrings.append(race.data + '\n')
 
     i = 0
     NEWRACES = {}
@@ -175,7 +215,7 @@ def CompareRaces(races, txtFile, hasCategory, chess):
     for race in races:
         if len(race.data) == 0:
             continue
-        if not race.data in fileRaces:
+        if not race.data + '\n' in fileRaces:
             #if we cant find it a race has been added
             NEWRACES[race] = GetMessageString(race.data, True, hasCategory, chess)
          
@@ -183,14 +223,14 @@ def CompareRaces(races, txtFile, hasCategory, chess):
     for fileRace in fileRaces:
         if not fileRace in raceDataStrings:
             #if we cant find it a race has been removed
-            NEWRACES[race] = GetMessageString(fileRace, False, hasCategory, chess)
+            NEWRACES[fileRace] = GetMessageString(fileRace, False, hasCategory, chess)
     return NEWRACES
 
 async def UpdateCommentators(race, newCommentators):
     print('updating commentators')
     messageContent = ''
-    if race.messageData:
-        messageContent = race.messageData.content
+    if raceMessages[race]:
+        messageContent = raceMessages[race].content
     
     newCommentatorsString = ''
     for commentator in newCommentators:
@@ -204,36 +244,70 @@ async def UpdateCommentators(race, newCommentators):
     for contentLine in contentLines:
         newMessage += contentLine + '\n'
     
-    if race.messageData:
-        await race.messageData.edit(content = newMessage)
+    if raceMessages[race]:
+        await raceMessages[race].edit(content = newMessage)
     
     race.commentators = newCommentators 
+    return race
         
 
 async def CheckCommentators(races, sheet, hasCategory):
+    print('checking coms')
+    #get all values from the sheet
     values = GetSheet(sheet, commentatorsSampleRange)
-    newCommentators = []
-    for race in races:
-        if not race.messageData:
+    #set variables needed
+    raceValueCount = 5 if hasCategory else 4
+    racerOneTimeRow = 3 if hasCategory else 2
+    raceValues = []
+    comsValues = []
+    #go through each row and separate into 2 parts
+    #TODO: move this into raceData and do both there cause we are doing everything
+    for row in values:
+        if len(row) < raceValueCount + 1:
             continue
+        racePart = ''
+        comsPart = ''
+        racePart += row[0]
+        comsPart += row[raceValueCount]
+        for i in range(len(row) - 1):
+            if i + 1 < raceValueCount and i + 1 != racerOneTimeRow:
+                racePart += ',' + row[i + 1]
+            elif i + 1 > raceValueCount:
+                comsPart += row[i + 1]
+        raceValues.append(racePart)
+        comsValues.append(comsPart)
+
+    newCommentators = []
+    #go through every scheduled race we have sent
+    for race in raceMessages:
+        #reset newcommentators ready for next part
         newCommentators.clear()
-        print(race.row)
-        print(len(values))
-        if race.row < len(values):
+        #if its a part of the current set
+        if race in raceMessages:
             column = 1 if hasCategory else 0
-            if(values[race.row ]):
-                commentatorsRow = values[race.row]
-                if commentatorsRow[column]:
-                    commentators = commentatorsRow[column]
+            for i in range(len(raceValues) - 1):
+                #get the commentators row
+                commentators = ''
+                if(raceValues[i] == race.data):
+                    commentators = comsValues[i]
+                #if that was successful
+                if commentators:
+                    print(commentators)
+                    #split up the commentators found
                     commentatorsSplit = commentators.split('/')
                     for split in commentatorsSplit:
                         newCommentators.append(split)
+        
+        #check everything is correct
         if len(newCommentators) < 1:
             continue
         print(race.commentators)
         print(newCommentators)
-        if(len(race.commentators) < 1 or race.commentators[0] != newCommentators[0] or race.commentators[1] != newCommentators[1]):
-            await UpdateCommentators(race, newCommentators)
+        if(len(race.commentators) < 2 or race.commentators[0] != newCommentators[0] or race.commentators[1] != newCommentators[1]):
+            #if it is update commentators
+            index = races.index(race)
+            races[index] = await UpdateCommentators(race, newCommentators)
+    return races
 
 ########################ACTUAL CODE##############################
 
@@ -244,11 +318,10 @@ client = discord.Client()
 #client.run(TOKEN)
 
 
-async def CheckRaces(sheet, txtFile, channel, hasCategory, chess):
-    races = GetRaceData(sheet, hasCategory)
+async def CheckRaces(sheet, txtFile, extrasTxtFile, channel, hasCategory, chess):
+    races = GetRaceData(sheet, extrasTxtFile, hasCategory)
     changes = CompareRaces(races, txtFile, hasCategory, chess)
     WriteRacesToFile(races, txtFile)
-
     empty = True
     #go through every change
     for change in changes:
@@ -256,26 +329,31 @@ async def CheckRaces(sheet, txtFile, channel, hasCategory, chess):
             #print the change
             print(chunk)
             #update the message ID
-            change.messageData = await client.get_channel(channel).send(chunk)
+            if type(change) != type(' '):
+                raceMessages[change] = await client.get_channel(channel).send(chunk)
+            else:
+               await client.get_channel(channel).send(chunk)
             empty = False
     #if its empty print for debug
     if empty:
         print('no new races for ' + txtFile)
 
-    await CheckCommentators(races, sheet, hasCategory)
+    races = await CheckCommentators(races, sheet, hasCategory)
+    WriteExtrasToFile(races, extrasTxtFile)
+
     return races
 
 async def CheckSharcordRaces():
-    return await CheckRaces(sharcordSheet, sharcordTxtFile, sharcordChannel, True, False)
+    return await CheckRaces(sharcordSheet, sharcordTxtFile, sharcordExtrasTxtFile, sharcordChannel, True, False)
 
 async def CheckTestSharcordRaces():
-    return await CheckRaces(testSheet, sharcordTxtFile, testChannel, True, False)
+    return await CheckRaces(testSheet, sharcordTxtFile, sharcordExtrasTxtFile, testChannel, True, False)
 
 async def CheckChessRaces():
-    return await CheckRaces(chessSheet, chessTxtFile, chessChannel, False, True)
+    return await CheckRaces(chessSheet, chessTxtFile, chessExtrasTxtFile, chessChannel, False, True)
 
 async def CheckTestChessRaces():
-    return await CheckRaces(chessSheet, chessTxtFile, testChannelTwo, False, True)
+    return await CheckRaces(chessSheet, chessTxtFile, chessExtrasTxtFile, testChannelTwo, False, True)
 
 
 async def Main():

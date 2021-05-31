@@ -104,5 +104,5 @@
 17/05/21 | 9:00PM BST,ASM until 4-6 (No CSS),dylrsmith,Moleman
 20/05/21 | 11:30AM BST,ASM Console,AtomicCaleb,Ticker
 20/05/21 | 9:00PM BST,ASM,DerekRuns,ducbob
-test,test,TEST,TEST
+test,test,TEST,TEST|person|person2
 end,end,end,end
