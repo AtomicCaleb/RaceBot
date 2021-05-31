@@ -31,6 +31,7 @@ class Race:
     commentators = []
 
 sharcordRaces = []
+tournamentRaces = []
 chessRaces = []
 
 raceMessages = {}
@@ -38,13 +39,15 @@ raceMessages = {}
 #text files
 sharcordTxtFile = 'sharcordRaces.txt'
 sharcordTestTxtFile = 'testSharcordRaces.txt'
+tournamentTxtFile = 'tournamentRaces.txt'
 chessTxtFile = 'chessRaces.txt'
 chessTestTxtFile = 'testChessRaces.txt'
 
 
 # The ID and range of a sample spreadsheet.
 raceDataSampleRange = 'A2:E'
-commentatorsSampleRange = 'A2:H'
+tournamentDataSampleRange = '\'SHAR 2021 ASM Tourney\'!A2:E'
+commentatorsSampleRange = 'A2:K'
 
 #channels
 sharcordChannel = 847495184660955146
@@ -110,8 +113,8 @@ def GetSheet(sheetToUse, sampleRange):
                                 range=sampleRange).execute()
     return result.get('values', [])
 
-def GetRaceData(sheet, hasCategory):
-    values = GetSheet(sheet, raceDataSampleRange)
+def GetRaceData(sheet, sampleRange, hasCategory):
+    values = GetSheet(sheet, sampleRange)
     raceDatas = []
     
     if not values:
@@ -157,6 +160,7 @@ def GetRaceData(sheet, hasCategory):
 def GetMessageString(raceInfo, added, hasCategory, chess):
      raceString = ''
      #split up the data 
+     print(raceInfo)
      raceInfoList = raceInfo.split(',')
 
      #format it correctly
@@ -208,8 +212,12 @@ async def UpdateCommentators(race, newCommentators):
         messageContent = raceMessages[race].content
     
     newCommentatorsString = ''
+    count = 0
     for commentator in newCommentators:
+        if count == 1:
+            newCommentatorsString += 'and '
         newCommentatorsString += commentator + ' ' 
+        count += 1
 
     contentLines = messageContent.split('\n')
     if len(contentLines) > 4:
@@ -285,10 +293,11 @@ async def CheckCommentators(races, sheet, hasCategory):
             for i in range(len(raceValues) - 1):
                 #get the commentators row
                 commentators = ''
+                #if its the correct row
                 if(raceValues[i] == race.data):
                     #add the restreamer
-                    if restreamValues:
-                        await UpdateRestreamer(race, restreamValues[i])
+                    print('restreamer: ' + restreamValues[i]) 
+                    await UpdateRestreamer(race, restreamValues[i])
                     commentators = comsValues[i]
                     #split up the commentators found
                     commentatorsSplit = commentators.split('/')
@@ -320,8 +329,8 @@ client = discord.Client()
 #client.run(TOKEN)
 
 
-async def CheckRaces(sheet, txtFile, channel, hasCategory, chess):
-    races = GetRaceData(sheet, hasCategory)
+async def CheckRaces(sheet, sampleRange, txtFile, channel, hasCategory, chess):
+    races = GetRaceData(sheet, sampleRange, hasCategory)
     changes = CompareRaces(races, txtFile, hasCategory, chess)
     WriteRacesToFile(races, txtFile)
     empty = True
@@ -347,20 +356,25 @@ async def CheckRaces(sheet, txtFile, channel, hasCategory, chess):
     return races
 
 async def CheckSharcordRaces():
-    return await CheckRaces(sharcordSheet, sharcordTxtFile, sharcordChannel, True, False)
+    return await CheckRaces(sharcordSheet, raceDataSampleRange, sharcordTxtFile, sharcordChannel, True, False)
+
+async def CheckTournamentSharcordRaces():
+    return await CheckRaces(sharcordSheet, tournamentDataSampleRange, tournamentTxtFile, testChannel, False, False)
+    return await CheckRaces(sharcordSheet, tournamentDataSampleRange, tournamentTxtFile, testChannel, False, False)
 
 async def CheckTestSharcordRaces():
-    return await CheckRaces(testSheet, sharcordTxtFile, testChannel, True, False)
+    return await CheckRaces(testSheet, raceDataSampleRange, sharcordTxtFile, testChannel, True, False)
 
 async def CheckChessRaces():
-    return await CheckRaces(chessSheet, chessTxtFile, chessChannel, False, True)
+    return await CheckRaces(chessTestSheet, raceDataSampleRange, chessTxtFile, chessChannel, False, True)
 
 async def CheckTestChessRaces():
-    return await CheckRaces(testSheetTwo, chessTxtFile, testChannelTwo, False, True)
+    return await CheckRaces(testSheetTwo, raceDataSampleRange, chessTxtFile, testChannelTwo, False, True)
 
 
 async def Main():
     while(True):
+        touramentRaces = await CheckTournamentSharcordRaces()
         sharcordRaces = await CheckTestSharcordRaces()
         chessRaces = await CheckTestChessRaces()
         time.sleep(10)
