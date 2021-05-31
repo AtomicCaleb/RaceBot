@@ -37,19 +37,14 @@ raceMessages = {}
 
 #text files
 sharcordTxtFile = 'sharcordRaces.txt'
-sharcordExtrasTxtFile = 'sharcordRaceExtras.txt'
-
 sharcordTestTxtFile = 'testSharcordRaces.txt'
-
 chessTxtFile = 'chessRaces.txt'
-chessExtrasTxtFile = 'chessRaceExtras.txt'
-
 chessTestTxtFile = 'testChessRaces.txt'
 
 
 # The ID and range of a sample spreadsheet.
 raceDataSampleRange = 'A2:E'
-commentatorsSampleRange = 'A2:G'
+commentatorsSampleRange = 'A2:H'
 
 #channels
 sharcordChannel = 847495184660955146
@@ -59,6 +54,7 @@ testChannelTwo = 848165475925229568
 
 #google sheets
 testSheet = '1IM24hRS_giIC5OcNNGBrHfwIZpbOcUyUURgt-q4913w'
+testSheetTwo = '18AnEII0BIMht0-eZn3-eHqWsqav8LbRmaFH_6T-H4gM'
 sharcordSheet = '1HB6LujCo6R2XeIVrWYdAZ8gQkA7qWrTF9QQlAWblizY'
 chessSheet = '1QAFp_BOB1j_0v_8S6ubhAITvKZru0mcZv_amgvpbbYc'
 
@@ -114,14 +110,9 @@ def GetSheet(sheetToUse, sampleRange):
                                 range=sampleRange).execute()
     return result.get('values', [])
 
-def GetRaceData(sheet, extrasTxtFile, hasCategory):
+def GetRaceData(sheet, hasCategory):
     values = GetSheet(sheet, raceDataSampleRange)
     raceDatas = []
-
-        #read the coms from file
-    extrasData = ()
-    with open(extrasTxtFile) as f:
-        extrasData = f.readlines()
     
     if not values:
         print('No data found.')
@@ -153,28 +144,12 @@ def GetRaceData(sheet, extrasTxtFile, hasCategory):
                     data = row[dateTime] + ',' + row[category] + ',' + row[runnerOne] +',' + row[runnerTwo]
                     raceData.data = data
                     raceData.row = values.index(row)
-                    #check if a coms row is the same
-                    if len(extrasData) == 1:
-                        continue
-                    for comsData in extrasData:
-                        comsData = data.split('|')
-                        if comsData[0] == data:
-                            for i in range(len(comsData) - 1):
-                                raceData.commentators.append(comsData[i+1])
 
             else:
                 if row[dateTime] and row[category] and row[runnerOne] and row[runnerTwo]:
                     data = row[dateTime] +',' + row[runnerOne] +',' + row[runnerTwo]
                     raceData.data = data
                     raceData.row = values.index(row)
-                    #check if a coms row is the same
-                    if len(extrasData) == 1:
-                        continue
-                    for comsData in extrasData:
-                        comsData = data.split('|')
-                        if comsData[0] == data:
-                            for i in range(len(comsData) - 1):
-                                raceData.commentators.append(comsData[i+1])
 
             raceDatas.append(raceData)
     return raceDatas
@@ -193,7 +168,7 @@ def GetMessageString(raceInfo, added, hasCategory, chess):
      elif not chess:
         raceString += '\n Tournament Race \n Racers: %s VS %s\n Commentators: \n Restreamer: \n' % (raceInfoList[1], raceInfoList[2])
      else:
-        raceString += '\n Racers: %s VS %s Commentators: \n Restreamer: \n' % (raceInfoList[1], raceInfoList[2])
+        raceString += '\n 6 Chess Matches \n Racers: %s VS %s\n Commentators: \n Restreamer: \n' % (raceInfoList[1], raceInfoList[2])
          
     #return the formatted string for use
      return raceString
@@ -250,16 +225,33 @@ async def UpdateCommentators(race, newCommentators):
     race.commentators = newCommentators 
     return race
         
+async def UpdateRestreamer(race, restreamer):
+    print('updating restreamer')
+    #get the message contents
+    content = raceMessages[race].content
+    contentLines = content.split('\n')
+    
+    #split it up and change the correct part
+    if len(contentLines) > 5:
+        contentLines[5] = 'Restreamer: ' + restreamer
+    
+    #stitch it together
+    newMessage = ''
+    for contentLine in contentLines:
+        newMessage += contentLine + '\n'
+
+    await raceMessages[race].edit(content = newMessage)
 
 async def CheckCommentators(races, sheet, hasCategory):
-    print('checking coms')
     #get all values from the sheet
     values = GetSheet(sheet, commentatorsSampleRange)
     #set variables needed
     raceValueCount = 5 if hasCategory else 4
+    commsValueCount = 7 if hasCategory else 6
     racerOneTimeRow = 3 if hasCategory else 2
     raceValues = []
     comsValues = []
+    restreamValues = []
     #go through each row and separate into 2 parts
     #TODO: move this into raceData and do both there cause we are doing everything
     for row in values:
@@ -269,10 +261,16 @@ async def CheckCommentators(races, sheet, hasCategory):
         comsPart = ''
         racePart += row[0]
         comsPart += row[raceValueCount]
+        #add the restreamer part if its there
+        if len(row) > commsValueCount:
+            restreamValues.append(row[commsValueCount])
+        #loop through each part of the row
         for i in range(len(row) - 1):
+            #check if its a race part
             if i + 1 < raceValueCount and i + 1 != racerOneTimeRow:
                 racePart += ',' + row[i + 1]
-            elif i + 1 > raceValueCount:
+            #check if its a comms part
+            elif i + 1 > raceValueCount and i + 1 < commsValueCount:
                 comsPart += row[i + 1]
         raceValues.append(racePart)
         comsValues.append(comsPart)
@@ -284,30 +282,34 @@ async def CheckCommentators(races, sheet, hasCategory):
         newCommentators.clear()
         #if its a part of the current set
         if race in raceMessages:
-            column = 1 if hasCategory else 0
             for i in range(len(raceValues) - 1):
                 #get the commentators row
                 commentators = ''
                 if(raceValues[i] == race.data):
+                    #add the restreamer
+                    if restreamValues:
+                        await UpdateRestreamer(race, restreamValues[i])
                     commentators = comsValues[i]
-                #if that was successful
-                if commentators:
-                    print(commentators)
                     #split up the commentators found
                     commentatorsSplit = commentators.split('/')
                     for split in commentatorsSplit:
                         newCommentators.append(split)
         
         #check everything is correct
+        for commentator in newCommentators:
+            print (commentator)
         if len(newCommentators) < 1:
             continue
-        print(race.commentators)
-        print(newCommentators)
-        if(len(race.commentators) < 2 or race.commentators[0] != newCommentators[0] or race.commentators[1] != newCommentators[1]):
-            #if it is update commentators
-            index = races.index(race)
-            races[index] = await UpdateCommentators(race, newCommentators)
-    return races
+        
+        await UpdateCommentators(race, newCommentators)
+#        if race in races:
+#            print('race in races')
+#            #if it is update commentators
+#            index = 0
+#            if races.index(race):
+#                index = races.index(race)
+#            races[index] = await UpdateCommentators(race, newCommentators)
+#    return races
 
 ########################ACTUAL CODE##############################
 
@@ -318,8 +320,8 @@ client = discord.Client()
 #client.run(TOKEN)
 
 
-async def CheckRaces(sheet, txtFile, extrasTxtFile, channel, hasCategory, chess):
-    races = GetRaceData(sheet, extrasTxtFile, hasCategory)
+async def CheckRaces(sheet, txtFile, channel, hasCategory, chess):
+    races = GetRaceData(sheet, hasCategory)
     changes = CompareRaces(races, txtFile, hasCategory, chess)
     WriteRacesToFile(races, txtFile)
     empty = True
@@ -338,29 +340,30 @@ async def CheckRaces(sheet, txtFile, extrasTxtFile, channel, hasCategory, chess)
     if empty:
         print('no new races for ' + txtFile)
 
-    races = await CheckCommentators(races, sheet, hasCategory)
-    WriteExtrasToFile(races, extrasTxtFile)
+    await CheckCommentators(races, sheet, hasCategory)
+    #races = await CheckCommentators(races, sheet, hasCategory)
+    #WriteExtrasToFile(races)
 
     return races
 
 async def CheckSharcordRaces():
-    return await CheckRaces(sharcordSheet, sharcordTxtFile, sharcordExtrasTxtFile, sharcordChannel, True, False)
+    return await CheckRaces(sharcordSheet, sharcordTxtFile, sharcordChannel, True, False)
 
 async def CheckTestSharcordRaces():
-    return await CheckRaces(testSheet, sharcordTxtFile, sharcordExtrasTxtFile, testChannel, True, False)
+    return await CheckRaces(testSheet, sharcordTxtFile, testChannel, True, False)
 
 async def CheckChessRaces():
-    return await CheckRaces(chessSheet, chessTxtFile, chessExtrasTxtFile, chessChannel, False, True)
+    return await CheckRaces(chessSheet, chessTxtFile, chessChannel, False, True)
 
 async def CheckTestChessRaces():
-    return await CheckRaces(chessSheet, chessTxtFile, chessExtrasTxtFile, testChannelTwo, False, True)
+    return await CheckRaces(testSheetTwo, chessTxtFile, testChannelTwo, False, True)
 
 
 async def Main():
     while(True):
         sharcordRaces = await CheckTestSharcordRaces()
         chessRaces = await CheckTestChessRaces()
-        time.sleep(15)
+        time.sleep(10)
 
 
 def Chunks(s, n):
