@@ -12,10 +12,15 @@ from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
+
+from time import gmtime
+from time import mktime
+import datetime
+import time
+
 import os
 import os.path
 import discord
-import time
 
 
 ##########################VARIABLES#################
@@ -26,9 +31,10 @@ SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly']
 #race data stuff
 class Race:
     data = ''
-    raceTime = time.gmtime
+    raceTime = ''
     row = 0
     commentators = []
+    runnerTimes = []
 
 sharcordRaces = []
 tournamentRaces = []
@@ -47,6 +53,7 @@ chessTestTxtFile = 'testChessRaces.txt'
 # The ID and range of a sample spreadsheet.
 raceDataSampleRange = 'A2:E'
 tournamentDataSampleRange = '\'SHAR 2021 ASM Tourney\'!A2:E'
+tournamentCommentatorDataSampleRange = '\'SHAR 2021 ASM Tourney\'!A2:K'
 commentatorsSampleRange = 'A2:K'
 
 #channels
@@ -61,12 +68,19 @@ testSheetTwo = '18AnEII0BIMht0-eZn3-eHqWsqav8LbRmaFH_6T-H4gM'
 sharcordSheet = '1HB6LujCo6R2XeIVrWYdAZ8gQkA7qWrTF9QQlAWblizY'
 chessSheet = '1QAFp_BOB1j_0v_8S6ubhAITvKZru0mcZv_amgvpbbYc'
 
+#Race Message Stuff
+timeAfterRaceToDelete = 7200
 
 #####################FUNCTIONS################################
 
+def GetTimeDifferenceFromGMT(time):
+    secondsSinceGMT = mktime(time)
+    currentTimeGMT = mktime(gmtime())
+    return secondsSinceGMT - currentTimeGMT
+
 def GetRaceTime(timeString):
-    dateTimeFormat = '%d/%m/%y | %H:%M%P %Z'
-    return datetime.strptime(timeString, dateTimeFormat)
+    dateTimeFormat = '%d/%m/%y | %I:%M%p %Z'
+    return time.strptime(timeString, dateTimeFormat)
 
 def WriteRacesToFile(races, fileName):
     with open(fileName, 'w') as f:
@@ -153,7 +167,12 @@ def GetRaceData(sheet, sampleRange, hasCategory):
                     data = row[dateTime] +',' + row[runnerOne] +',' + row[runnerTwo]
                     raceData.data = data
                     raceData.row = values.index(row)
-
+            try:    
+                raceData.raceTime = GetRaceTime(row[dateTime])
+            except:
+                i = 0
+                #print(row[dateTime] + ' not a valid raceTime')
+            
             raceDatas.append(raceData)
     return raceDatas
 
@@ -214,7 +233,7 @@ async def UpdateCommentators(race, newCommentators):
     newCommentatorsString = ''
     count = 0
     for commentator in newCommentators:
-        if count == 1:
+        if count > 0:
             newCommentatorsString += 'and '
         newCommentatorsString += commentator + ' ' 
         count += 1
@@ -250,9 +269,9 @@ async def UpdateRestreamer(race, restreamer):
 
     await raceMessages[race].edit(content = newMessage)
 
-async def CheckCommentators(races, sheet, hasCategory):
+async def CheckCommentators(races, sampleRange, sheet, hasCategory):
     #get all values from the sheet
-    values = GetSheet(sheet, commentatorsSampleRange)
+    values = GetSheet(sheet, sampleRange)
     #set variables needed
     raceValueCount = 5 if hasCategory else 4
     commsValueCount = 7 if hasCategory else 6
@@ -260,6 +279,7 @@ async def CheckCommentators(races, sheet, hasCategory):
     raceValues = []
     comsValues = []
     restreamValues = []
+    runnerValues = []
     #go through each row and separate into 2 parts
     #TODO: move this into raceData and do both there cause we are doing everything
     for row in values:
@@ -268,7 +288,7 @@ async def CheckCommentators(races, sheet, hasCategory):
         racePart = ''
         comsPart = ''
         racePart += row[0]
-        comsPart += row[raceValueCount]
+        runnerValues.append(row[racerOneTimeRow] + ',' + row[raceValueCount])
         #add the restreamer part if its there
         if len(row) > commsValueCount:
             restreamValues.append(row[commsValueCount])
@@ -295,6 +315,9 @@ async def CheckCommentators(races, sheet, hasCategory):
                 commentators = ''
                 #if its the correct row
                 if(raceValues[i] == race.data):
+                    timesSplit = runnerValues[i].split(',')
+                    for split in timesSplit:
+                        race.runnerTimes.append(split)
                     #add the restreamer
                     print('restreamer: ' + restreamValues[i]) 
                     await UpdateRestreamer(race, restreamValues[i])
@@ -318,7 +341,19 @@ async def CheckCommentators(races, sheet, hasCategory):
 #            if races.index(race):
 #                index = races.index(race)
 #            races[index] = await UpdateCommentators(race, newCommentators)
-#    return races
+    return races
+
+async def CheckRaceTimes():
+    #for each message we have sent
+    for race in raceMessages:
+        if race.raceTime:
+            secondsUntilGMT = GetTimeDifferenceFromGMT(race.raceTime) 
+            if secondsUntilGMT < -timeAfterRaceToDelete:
+                raceData = race.data.split(',')
+                newMessage = '**Race Completed**\n %s [%s]\n %s [%s]' % (raceData[2], race.runnerTimes[0], raceData[3], race.runnerTimes[1])
+                await raceMessages[race].edit(content = newMessage, delete_after = 1)
+                raceMessages.pop(race)
+                break
 
 ########################ACTUAL CODE##############################
 
@@ -329,7 +364,7 @@ client = discord.Client()
 #client.run(TOKEN)
 
 
-async def CheckRaces(sheet, sampleRange, txtFile, channel, hasCategory, chess):
+async def CheckRaces(sheet, sampleRange, comsSampleRange, txtFile, channel, hasCategory, chess):
     races = GetRaceData(sheet, sampleRange, hasCategory)
     changes = CompareRaces(races, txtFile, hasCategory, chess)
     WriteRacesToFile(races, txtFile)
@@ -349,34 +384,35 @@ async def CheckRaces(sheet, sampleRange, txtFile, channel, hasCategory, chess):
     if empty:
         print('no new races for ' + txtFile)
 
-    await CheckCommentators(races, sheet, hasCategory)
+    races = await CheckCommentators(races, comsSampleRange, sheet, hasCategory)
     #races = await CheckCommentators(races, sheet, hasCategory)
     #WriteExtrasToFile(races)
 
     return races
 
 async def CheckSharcordRaces():
-    return await CheckRaces(sharcordSheet, raceDataSampleRange, sharcordTxtFile, sharcordChannel, True, False)
+    return await CheckRaces(sharcordSheet, raceDataSampleRange, commentatorsSampleRange, sharcordTxtFile, sharcordChannel, True, False)
 
 async def CheckTournamentSharcordRaces():
-    return await CheckRaces(sharcordSheet, tournamentDataSampleRange, tournamentTxtFile, testChannel, False, False)
-    return await CheckRaces(sharcordSheet, tournamentDataSampleRange, tournamentTxtFile, testChannel, False, False)
+    return await CheckRaces(sharcordSheet, tournamentDataSampleRange, tournamentCommentatorDataSampleRange, tournamentTxtFile, testChannel, False, False)
 
 async def CheckTestSharcordRaces():
-    return await CheckRaces(testSheet, raceDataSampleRange, sharcordTxtFile, testChannel, True, False)
+    return await CheckRaces(testSheet, raceDataSampleRange, commentatorsSampleRange, sharcordTxtFile, testChannel, True, False)
 
 async def CheckChessRaces():
-    return await CheckRaces(chessTestSheet, raceDataSampleRange, chessTxtFile, chessChannel, False, True)
+    return await CheckRaces(chessTestSheet, raceDataSampleRange, commentatorsSampleRange, chessTxtFile, chessChannel, False, True)
 
 async def CheckTestChessRaces():
-    return await CheckRaces(testSheetTwo, raceDataSampleRange, chessTxtFile, testChannelTwo, False, True)
+    return await CheckRaces(testSheetTwo, raceDataSampleRange, commentatorsSampleRange, chessTxtFile, testChannelTwo, False, True)
 
 
 async def Main():
     while(True):
+        #print(GetRaceTime('20/05/21 | 9:00PM GMT'))
         touramentRaces = await CheckTournamentSharcordRaces()
         sharcordRaces = await CheckTestSharcordRaces()
         chessRaces = await CheckTestChessRaces()
+        await CheckRaceTimes()
         time.sleep(10)
 
 
