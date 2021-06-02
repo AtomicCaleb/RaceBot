@@ -1,108 +1,19 @@
-30/07/20 | 12:00PM BST,100%,Caleb,Gordo
-01/08/20 | 12:00PM BST,ASM,Greeny0359,haz
-02/08/20 | 9:00PM BST,ksfqqGTruck ASM,Baconman12,12_Kelvin
-03/08/20 | 11:00PM BST,ASM,Slendbed,Axington123
-05/08/20 | 1:00PM BST,Better Any%,Spruce,Axington123
-06/08/20 | 11:00PM BST,NMW/ASM,dylrsmith,djlambton
-07/08/20 | 11:00PM BST,Any%,CRKTCB,Bulmers
-08/08/20 | 5:00AM BST,NMW,ItsTicker,dtops24
-09/08/20 | 4:00AM BST,ASM,Spearmeister,dtops24
-09/08/20 | 2:00PM BST,ASM,Finnesse,plugsocketxxl
-10/08/20 | 1:00PM BST,ASM,Baconman12,KthRam
-12/08/20 | 12:00AM BST ,UAM Lockout Bingo,Bulmers,Kelvin
-12/08/20 | 4:00AM BST,ASM,BeingofUniverse,LP3Cinema
-12/08/20 | 11:00PM BST,BW vs FW NG+,Critch,Bulmers
-13/08/20 | 11:00PM BST,UAM Lockout Bingo,Sadly stinky,Gibstank
-14/08/20 | 8:00PM BST,ASM,LP3Cinema,djlambton
-15/08/20 | 2:00AM BST,WWII Rocket Car Only ASM,Gibstank,LP3Cinema
-15/08/20 | 10:00AM BST,100%,Bamford,jpecimage
-15/08/20 | 10:00PM BST,ASM,Axington123,VeryOriginal95
-16/08/20 | 12:00PM BST,ASM,FreakyTopHat,MayorQuimby
-17/08/20 | 12:00AM BST,2v2 UAM Lockout Bingo,LP3 & Sadly,Bulmers & Critch
-17/08/20 | 11:00AM BST,Family Sedan Only ASM,Caleb,Gordo
-17/08/20 | 11:00PM BST,ASM,12_Kelvin,dylrsmith
-19/08/20 | 11:00PM BST,ASM,Critch,Bulmers
-02/09/20 | 11:00PM BST,NMW,Critch,Bulmers
-09/09/20 | 7:15PM BST,UAM Lockout Bingo,12_Kelvin,LiquidWiFi
-11/09/20 | 1:00AM BST,ASM,BeingofUniverse,djlambton
-13/09/20 | 8:00PM BST,100%,Derek,Baconman12
-15/09/20 | 2:00PM BST,All Tasks NLR,Sid,Spruce
-16/09/20 | 1:00PM BST,NMW/ASM,ItsTicker,Axington123
-17/09/20 | 9:00PM BST,ASM,dylrsmith,haz
-18/09/20 | 11:00PM BST,Blackout Bingo*,Greenbulmers,Critch
-19/09/20 | 3:00PM BST,ASM,Nytheris,Monstaniac
-19/09/20 | 10:00PM BST,NMW,12_Kelvin,Greenbulmers
-25/09/20 | 8:00PM BST,Blackout Bingo*,Vapo,Baconman12
-26/09/20 | 12:00PM BST,ASM,greeny0359,MayorQuimby
-26/09/20 | 2:00PM BST,ASM,Slateermine,Axington123
-26/09/20 | 9:00PM BST,Cletus Truck %,KthRam,Spruce/Sid
-27/09/20 | 10:00PM BST,Any%,KthRam,VeryOriginal95
-28/09/20 | 8:00PM BST,NMW,Axington123,djlambton
-01/10/20 | 9:00PM BST,ASM,Sid3300,djlambton
-02/10/20 | 10:00PM BST,All Tasks NLR,Greenbulmers ,Critch_
-03/10/20 | 8:00PM BST,100%,Bamford,Spruce
-18/10/20 | 12:00AM BST,ASM,Bamford,Timbs
-20/10/20 | 10:00PM BST,ASM,Slendbed,Sid
-31/10/20 | 9:30PM GMT,Forced Car%,Spruce,Sid/KthRam
-06/11/20 | 8:00PM GMT,ASM,Axington123,Tillbert
-08/11/20 | 3:00PM GMT,ASM,Bamford,MayorQuimby
-14/11/20 | 8:00PM GMT,99% NLR,haz,Spruce
-15/11/20 | 5:00PM GMT,ASM Relay,Shag and friends,The Rats
-15/11/20 | 8:30PM GMT,Clown car%,Axington123,VeryOriginal95
-17/11/20 | 7:00PM GMT,Randomiser ASM (seeded),Vapo,Baconman12
-18/11/20 | 7:30PM GMT,Blackout Bingo*,Axington123,Greenbulmers
-21/11/20 | 3:00AM GMT,ASM,Tonedog,LP3Cinema
-22/11/20 | 1:00AM GMT,All Mission Warps,Bamford,Timbs
-25/11/20 | 3:00PM GMT,ASM Relay,Team UK,Team Aus 2
-26/11/20 | 2:00PM GMT,ASM v NMW,Axey,Sprucey
-28/11/20 | 11:00PM GMT,ASM Relay,Team EU,Team Aus 1
-04/12/20 | 10:00PM GMT,ASM Relay,Team USA,Team EU
-03/02/21 | 10:00PM GMT,Blackout Bingo*,Axington123,Greenbulmers
- 06/02/21 | 9:30PM GMT,Kremlin v Nerd Car,Sid3300 (Kremlin),Spruce37 (Nerd Car)
-12/02/21 | 8:00PM GMT,ASM,Tillbert13,Axington123
-21/02/21 | 5:00PM GMT,ASM,Regen,Misterowlman
-25/02/21 | 9:30PM GMT,ASM,crazytonedog,Sid3300
-03/03/21 | 11:00PM GMT,ASM,Derek,Greenbulmers 
-04/03/21 | 9:30PM GMT,ASM,Critch,dylrsmith
-05/03/21 | 9:00PM GMT,ASM,Moleman,ducbob
-06/03/21 | 8:00PM GMT,ASM,haz,AtomicCaleb
-07/03/21 | 2:00PM GMT,ASM,Axington123,Tophat
-08/03/21 | 10:00PM GMT,ASM,Derek,Moleman
-09/03/21 | 6:00AM GMT,ASM Console vs PC,Baconman12,crazytonedog
-09/03/21 | 8:30PM GMT,ASM,Critch,ducbob
-10/03/21 | 9:30PM GMT,ASM,haz,dylrsmith
-13/03/21 | 8:00PM GMT,ASM,Cricket,Axington123
-14/03/21 | 12:00PM GMT,ASM,Greenbulmers,AtomicCaleb
-14/03/21 | 2:00PM GMT,Schoool Bus V School Bus,MayorQuimby,Haus
-16/03/21 | 10:00PM GMT,ASM,Critch,Derek
-17/03/21 | 10:30PM GMT,ASM,AtomicCaleb,dylrsmith
-18/03/21 | 9:00PM GMT,ASM,Greenbulmers,Moleman
-20/03/21 | 8:00PM GMT,Monster Truck%,Spruce,Sid
-21/03/21 | 8:30PM GMT,ASM,haz,ducbob
-22/03/21 | 8:00PM GMT,Legacy NG+,Critch,Moleman
-26/03/21 | 11:00PM GMT,ASM,Caleb,ducbob
-27/03/21 | 8:30PM GMT,ASM,Derek,haz
-27/03/21 | 11:00PM GMT,NMW/ASM,dtops24,cxrky
-28/03/21 | 8:30PM BST,ASM,Greenbulmers,dylrsmith
-31/03/21 | 8:30PM BST,ASM,Greenbulmers,Critch
-03/04/21 | 2:00PM BST,ASM,haz,Moleman
-03/04/21 | 11:00PM BST,ASM,greeny0359,slendbed
-04/04/21 | 2:00AM BST,ASM,Caleb,Derek
-07/04/21 | 9:00PM BST,ASM,dylrsmith,ducbob
-08/04/21 | 1:30PM BST,ASM,Caleb,Moleman
-08/04/21 | 10:30PM BST,NMW ,DerekRuns,dylrSmith
-10/04/21 | 10:00AM BST,ASM,Critch,haz
-14/04/21 | 11:30AM BST,ASM,ducbob,Bulmers
-25/04/21 | 11:00AM BST,NMW,Caleb,Critch
-25/04/21 | 1:00PM BST,99% NMW,Bulmers ,haz
-25/04/21 | 9:00PM BST,ASM (No CSS),Moleman,dylrsmith
-27/04/21 | 8:00PM BST,All Street Races,Axington123,Cricket
-28/04/21 | 9:00PM BST,ASM,Sid3300,Towsen
-29/04/21 | 11:00PM BST,ASM,Derek,ducbob
-04/05/21 | 12:00PM BST,ASM,ItsTicker,Axington123
 06/05/21 | 1:00AM BST,ASM,BeingofUniverse,crazytonedog
-17/05/21 | 9:00PM BST,ASM until 4-6 (No CSS),dylrsmith,Moleman
-20/05/21 | 11:30AM BST,ASM Console,AtomicCaleb,Ticker
+17/05/21 | 9:00PM GMT,ASM until 4-6 (No CSS),dylrsmith,Moleman
+20/05/21 | 11:30AM GMT,ASM Console,AtomicCaleb,Ticker
 20/05/21 | 9:00PM BST,ASM,DerekRuns,ducbob
-31/05/21 | 8:00PM GMT,ASM,ducbob,Moleman
+31/05/21 | 9:00PM BST,ASM,ducbob,Moleman
+01/06/21 | 1:30AM GMT,ASM,DerekRuns,ducbob
+02/06/21 | 12:44AM BST,ASM,DerekRuns,ducbob
+01/06/21 | 12:44AM GMT,ASM,DerekRuns,ducbob
+01/06/21 | 12:44AM GMT,ASM,notpenis,ducbob
+20/05/21 | 11:30AM GMT,newrace,notpenis,test2
+20/05/21 | 11:30AM GMT,test,notpenis,test1
+20/05/21 | 11:30AM GMT,test,runner 1,runner 2
+20/05/21 | 11:30AM GMT,test,Runner 1,Runner 2
+31/05/22 | 10:00PM GMT,ASM,ducbob,Moleman
+06/05/21 | 1:00AM BST,ASM,BeingofUniverse,crazytonedog
+17/05/21 | 9:00PM GMT,ASM until 4-6 (No CSS),dylrsmith,Moleman
+14/04/21 | 11:30AM GMT,ASM,ducbob,Bulmers
+25/04/22 | 11:00AM GMT,NMW,Caleb,Critch
 end,end,end,end

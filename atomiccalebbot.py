@@ -34,7 +34,10 @@ class Race:
     raceTime = ''
     row = 0
     commentators = []
+    restreamer = ''
     runnerTimes = 'null, null'
+    commentatorPinged = False
+    restreamerPinged = False
 
 sharcordRaces = []
 tournamentRaces = []
@@ -70,6 +73,12 @@ chessSheet = '1QAFp_BOB1j_0v_8S6ubhAITvKZru0mcZv_amgvpbbYc'
 
 #Race Message Stuff
 timeAfterRaceToDelete = 7200
+
+commentatorPingTime = 3600
+commentatorPing = '<@&333545129400991745>'
+
+restreamerPingTime = 3600
+restreamerPing = '<@&367903988311392257>'
 
 #####################FUNCTIONS################################
 def GetTimeDifferenceFromGMT(time):
@@ -328,6 +337,7 @@ async def CheckCommentators(races, sampleRange, sheet, hasCategory):
                 #races[races.index(race)].runnerTimes.clear()
                 race.runnerTimes = runnerValues[i]
                 #add the restreamer
+                race.restreamer = restreamValues[i]
                 await UpdateRestreamer(race, restreamValues[i])
                 commentators = comsValues[i]
                 #split up the commentators found
@@ -395,6 +405,28 @@ async def CheckRaceTimes(races):
                         raceMessages.pop(raceTemp)
                         await CheckRaceTimes(races)
                         return
+async def CheckCommentatorPings():
+    for race in raceMessages:
+        secondsUntilGMT = GetTimeDifferenceFromGMT(race.raceTime)
+        #if we are passed the time, havent pinged, and need commentators
+        if(secondsUntilGMT < commentatorPingTime and not race.commentatorPinged and len(race.commentators) < 2):
+            raceDataList = race.data.split(',')
+            if len(raceDataList) > 3:
+                message = '%s needed in 1 hour for %s vs %s' % (commentatorPing, raceDataList[1], raceDataList[3])
+                await raceMessages[race].channel.send(message)
+                race.commentatorPinged = True
+
+async def CheckRestreamerPings():
+    for race in raceMessages:
+        secondsUntilGMT = GetTimeDifferenceFromGMT(race.raceTime)
+        #if we are passed the time, havent pinged, and need commentators
+        if(secondsUntilGMT < restreamerPingTime and not race.restreamerPinged and not race.restreamer):
+            raceDataList = race.data.split(',')
+            if len(raceDataList) > 3:
+                message = '%s needed in 1 hour for %s vs %s' % (restreamerPing, raceDataList[1], raceDataList[3])
+                await raceMessages[race].channel.send(message)
+                race.restreamerPinged = True
+
 ########################ACTUAL CODE##############################
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
@@ -431,16 +463,16 @@ async def CheckRaces(sheet, sampleRange, comsSampleRange, txtFile, channel, hasC
 #Dict<Race, string>
 #List<Race>
 async def CheckSharcordRaces():
-    return await CheckRaces(sharcordSheet, raceDataSampleRange, commentatorsSampleRange, sharcordTxtFile, testChannel, True, False)
+    return await CheckRaces(sharcordSheet, raceDataSampleRange, commentatorsSampleRange, sharcordTxtFile, sharcordChannel, True, False)
 
 async def CheckTournamentSharcordRaces():
-    return await CheckRaces(sharcordSheet, tournamentDataSampleRange, tournamentCommentatorDataSampleRange, tournamentTxtFile, testChannel, True, False)
+    return await CheckRaces(sharcordSheet, tournamentDataSampleRange, tournamentCommentatorDataSampleRange, tournamentTxtFile, sharcordChannel, True, False)
 
 async def CheckTestSharcordRaces():
     return await CheckRaces(testSheet, raceDataSampleRange, commentatorsSampleRange, sharcordTxtFile, testChannel, True, False)
 
 async def CheckChessRaces():
-    return await CheckRaces(chessSheet, raceDataSampleRange, commentatorsSampleRange, chessTxtFile, testChannel, False, True)
+    return await CheckRaces(chessSheet, raceDataSampleRange, commentatorsSampleRange, chessTxtFile, chessChannel, False, True)
 
 async def CheckTestChessRaces():
     return await CheckRaces(testSheetTwo, raceDataSampleRange, commentatorsSampleRange, chessTxtFile, testChannelTwo, False, True)
@@ -456,6 +488,9 @@ async def Main():
         await CheckRaceTimes(tournamentRaces)
         await CheckRaceTimes(chessRaces)
         await CheckRaceTimes(sharcordRaces)
+
+        await CheckCommentatorPings()
+        await CheckRestreamerPings()
         time.sleep(10)
 
 
