@@ -75,10 +75,10 @@ chessSheet = '1QAFp_BOB1j_0v_8S6ubhAITvKZru0mcZv_amgvpbbYc'
 timeAfterRaceToDelete = 7200
 
 commentatorPingTime = 3600
-commentatorPing = '<@&333545129400991745>'
+commentatorPing = '<@&596968452565106688>'
 
 restreamerPingTime = 3600
-restreamerPing = '<@&367903988311392257>'
+restreamerPing = '<@&697846193400840343>'
 
 #####################FUNCTIONS################################
 def GetTimeDifferenceFromGMT(time):
@@ -482,8 +482,8 @@ async def Main():
     while(True):
         #print(GetRaceTime('20/05/21 | 9:00PM GMT'))
         tournamentRaces = await CheckTournamentSharcordRaces()
-        sharcordRaces = await CheckSharcordRaces()
-        chessRaces = await CheckChessRaces()
+        sharcordRaces = await CheckTestSharcordRaces()
+        chessRaces = await CheckTestChessRaces()
 
         await CheckRaceTimes(tournamentRaces)
         await CheckRaceTimes(chessRaces)
@@ -509,13 +509,19 @@ async def on_message(message):
     if message.author == client.user:
        return
     #print(message.author + ':' + message.content);
-    
-    if message.content.startswith('sharcord races'):
+
+    print(message.content)
+
+    if 'sharcord races' in message.content:
         for chunk in Chunks(sharcordRaces, 2000):
             await message.channel.send(chunk)
 
-    if message.content.startswith('chess races'):
+    if 'chess races' in message.content:
         for chunk in Chunks(chessRaces, 2000):
             await message.channel.send(chunk)
 
+    if 'boat jump' in message.content and 'help' in message.content:
+        await message.channel.send('https://media.discordapp.net/attachments/580364471130783744/843613945235505182/image0.png')
+
 client.run(TOKEN)
+    
