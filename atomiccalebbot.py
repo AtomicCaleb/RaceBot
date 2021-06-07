@@ -36,8 +36,10 @@ class Race:
     commentators = []
     restreamer = ''
     runnerTimes = 'null, null'
+    peopleToPing = []
     commentatorPinged = False
     restreamerPinged = False
+    peoplePinged = False
 
 sharcordRaces = []
 tournamentRaces = []
@@ -54,10 +56,12 @@ chessTestTxtFile = 'testChessRaces.txt'
 
 
 # The ID and range of a sample spreadsheet.
-raceDataSampleRange = 'A2:E'
-tournamentDataSampleRange = '\'SHAR 2021 ASM Tourney\'!A2:E'
-tournamentCommentatorDataSampleRange = '\'SHAR 2021 ASM Tourney\'!A2:K'
-commentatorsSampleRange = 'A2:K'
+raceDataSampleRange = '\'SHAR Rival Races\'!A2:G'
+commentatorsSampleRange = '\'SHAR Rival Races\'!A2:M'
+tournamentDataSampleRange = '\'SHAR 2021 ASM Tourney\'!A2:G'
+tournamentCommentatorDataSampleRange = '\'SHAR 2021 ASM Tourney\'!A2:M'
+chessDataSampleRange = '\Sheet1!A2:E'
+chessCommentatorDataSampleRange = 'Sheet1!A2:K'
 
 #channels
 sharcordChannel = 847495184660955146
@@ -73,6 +77,7 @@ chessSheet = '1QAFp_BOB1j_0v_8S6ubhAITvKZru0mcZv_amgvpbbYc'
 
 #Race Message Stuff
 timeAfterRaceToDelete = 7200
+timerAfterMessageToDelete = 10800 
 
 commentatorPingTime = 3600
 commentatorPing = '<@&596968452565106688>'
@@ -80,15 +85,40 @@ commentatorPing = '<@&596968452565106688>'
 restreamerPingTime = 3600
 restreamerPing = '<@&697846193400840343>'
 
+peoplePingTime = 3600
+
 #####################FUNCTIONS################################
-def GetTimeDifferenceFromGMT(time):
-    secondsSinceGMT = mktime(time)
+def GetTimeDifferenceFromGMT(secondsSinceGMT):
+    if not time:
+        return 99999999
     currentTimeGMT = mktime(gmtime())
     return secondsSinceGMT - currentTimeGMT
 
 def GetRaceTime(timeString):
-    dateTimeFormat = '%d/%m/%y | %I:%M%p %Z'
-    return time.strptime(timeString, dateTimeFormat)
+    #get the timezone part (last 3 characters in the string)
+    length = len(timeString)
+    tzString = ''
+    for i in range(3):
+        letter = timeString[length - (3 - i)]
+        tzString += letter
+
+    #remove the timezone from the timeString
+    newTimeString = ''
+    for i in range(length - 3):
+        newTimeString += timeString[i]
+
+    #get the time now that we removed the timezone
+    dateTimeFormat = '%d/%m/%y | %I:%M%p '
+    newTime = mktime(time.strptime(newTimeString, dateTimeFormat))
+    #if it isnt a valid timzeone currently supported default to BST
+    if not 'BST' in tzString and not 'GMT' in tzString:
+        tzString = 'BST'
+
+    #if its BST add an hour
+    if tzString == 'BST':
+        newTime -= 3600
+
+    return newTime
 
 def WriteRacesToFile(races, fileName):
     with open(fileName, 'w') as f:
@@ -186,24 +216,23 @@ def GetRaceData(sheet, sampleRange, hasCategory):
 def GetMessageString(raceInfo, added, hasCategory, chess):
      raceString = ''
      #split up the data
-     print(raceInfo)
      raceInfoList = raceInfo.split(',')
 
      #format it correctly
      if added:
          if hasCategory:
-            raceString += '**Race Scheduled** \n Date/Time: %s \nCategory: %s \nRacers: %s VS %s\n Commentators: \nRestreamer: \n' % (raceInfoList[0], raceInfoList[1], raceInfoList[2], raceInfoList[3])
+            raceString += '**•Race Scheduled** \nDate/Time: %s \nGroup: %s \nRacers: %s VS %s\nCommentators: \nRestreamer: \n' % (raceInfoList[0], raceInfoList[1], raceInfoList[2], raceInfoList[3])
          elif not chess:
-            raceString += '**Tournament Race Scheduled**\nDate/Time:%s\nCategory: ASM \nRacers: %s VS %s\nCommentators: \nRestreamer: \n' % (raceInfoList[0],raceInfoList[1], raceInfoList[2])
+            raceString += '**•Tournament Race Scheduled**\nDate/Time:%s\nCategory: ASM \nRacers: %s VS %s\nCommentators: \nRestreamer: \n' % (raceInfoList[0],raceInfoList[1], raceInfoList[2])
          else:
-            raceString += '**Race Scheduled**\nDate/Time:%s\n6 Chess Matches \nRacers: %s VS %s\nCommentators: \nRestreamer: \n' % (raceInfoList[0], raceInfoList[1], raceInfoList[2])
+            raceString += '**•Race Scheduled**\nDate/Time:%s\n6 Chess Matches \nRacers: %s VS %s\nCommentators: \nRestreamer: \n' % (raceInfoList[0], raceInfoList[1], raceInfoList[2])
      else:
          if hasCategory:
-            raceString += '**Race Removed** \n Date/Time: %s \n Category: %s \n Racers: %s VS %s' % (raceInfoList[0], raceInfoList[1], raceInfoList[2], raceInfoList[3])
+            raceString += '**•Race Removed** \nDate/Time: %s \nGroup: %s \n Racers: %s VS %s' % (raceInfoList[0], raceInfoList[1], raceInfoList[2], raceInfoList[3])
          elif not chess:
-            raceString += '**Tournament Race Removed**\nDate/Time:%s \nCategory: ASM \nRacers: %s VS %s' % (raceInfoList[0], raceInfoList[1], raceInfoList[2])
+            raceString += '**•Tournament Race Removed**\nDate/Time:%s \nCategory: ASM \nRacers: %s VS %s' % (raceInfoList[0], raceInfoList[1], raceInfoList[2])
          else:
-            raceString += '**Race Removed**\nDate/Time:%s \n6 Chess Matches \nRacers: %s VS %s' % (raceInfoList[0], raceInfoList[1], raceInfoList[2])
+            raceString += '**•Race Removed**\nDate/Time:%s \n6 Chess Matches \nRacers: %s VS %s' % (raceInfoList[0], raceInfoList[1], raceInfoList[2])
              
         #return the formatted string for use
      return raceString
@@ -217,10 +246,19 @@ def CompareRaces(races, txtFile, hasCategory, chess):
     #get the info data
     for race in races:
         raceDataStrings.append(race.data + '\n')
+         
+    NEWRACES = {}
+    #check the file data agaisnt race data
+    for fileRace in fileRaces:
+        #print('checking' + fileRace)
+        #for raceData in raceDataStrings:
+        #    print(raceData)
+        if not fileRace in raceDataStrings:
+            #if we cant find it a race has been removed
+            NEWRACES[fileRace] = GetMessageString(fileRace, False, hasCategory, chess)
+            print(NEWRACES[fileRace])
 
     i = 0
-    NEWRACES = {}
-   
     #check the race data agaisnt the file
     for race in races:
         if len(race.data) == 0:
@@ -228,15 +266,7 @@ def CompareRaces(races, txtFile, hasCategory, chess):
         if not race.data + '\n' in fileRaces:
             #if we cant find it a race has been added
             NEWRACES[race] = GetMessageString(race.data, True, hasCategory, chess)
-         
-    #check the file data agaisnt race data
-    for fileRace in fileRaces:
-        #for raceData in raceDataStrings:
-        #    print(raceData)
-        if not fileRace in raceDataStrings:
-            #if we cant find it a race has been removed
-            NEWRACES[fileRace] = GetMessageString(fileRace, False, hasCategory, chess)
-            print(NEWRACES[fileRace])
+
     return NEWRACES
 
 async def UpdateCommentators(race, newCommentators):
@@ -262,8 +292,10 @@ async def UpdateCommentators(race, newCommentators):
         newMessage += contentLine + '\n'
     
     if raceMessages[race]:
-        await raceMessages[race].edit(content = newMessage)
-    
+        try:
+            await raceMessages[race].edit(content = newMessage)
+        except:
+            i = 0
     race.commentators = newCommentators 
     return race
         
@@ -281,8 +313,10 @@ async def UpdateRestreamer(race, restreamer):
     newMessage = ''
     for contentLine in contentLines:
         newMessage += contentLine + '\n'
-
-    await raceMessages[race].edit(content = newMessage)
+    try:
+        await raceMessages[race].edit(content = newMessage)
+    except:
+        i = 0
 
 async def CheckCommentators(races, sampleRange, sheet, hasCategory):
     #get all values from the sheet
@@ -369,7 +403,6 @@ async def CheckRaceTimes(races):
             if race.data == raceTemp.data:
                 if race.raceTime:
                     secondsUntilGMT = GetTimeDifferenceFromGMT(race.raceTime) 
-                    print(secondsUntilGMT)
                     if secondsUntilGMT < -timeAfterRaceToDelete:
                         raceData = race.data.split(',')
                         runnerOne = len(raceData) - 1
@@ -381,7 +414,8 @@ async def CheckRaceTimes(races):
                         runnerTwoList = runnerTimes[1].split(':')
                         #if its a single digit use highest
                         if(len(runnerOneList) == 1):
-                            winner = 1 if runnerOneList[0] > runnerTwoList[0] else 2
+                            if runnerOneList[0] != runnerTwoList[0]:
+                                winner = 1 if runnerOneList[0] > runnerTwoList[0] else 2
                         #otherwise loop through them to find lowest
                         else:
                             for i in range(len(runnerOneList)):
@@ -398,10 +432,13 @@ async def CheckRaceTimes(races):
                         loserName = raceData[runnerTwo] if winner == 2 else raceData[runnerOne]
                         category = raceData[1] if len(raceData) < 5 or winnerName == raceData[2] or winnerName == raceData[4] else 'Tournament Race'
                         if winner == 0:
-                            newMessage = '**Race Completed** (%s)\n%s [%s]\n%s [%s]' % (category, raceData[runnerOne], runnerTimes[0], raceData[runnerTwo], runnerTimes[1])
+                            newMessage = '**Race Completed** (%s)\n%s [%s] (TIE!)\n%s [%s] (TIE!)' % (category, raceData[runnerOne], runnerTimes[0], raceData[runnerTwo], runnerTimes[1])
                         else:
                             newMessage = '**Race Completed** (%s)\n%s [%s] (Winner!)\n%s [%s]' % (category, winnerName, winnerTime, loserName, loserTime)
-                        await raceMessages[raceTemp].edit(content = newMessage)
+                        try:
+                            await raceMessages[raceTemp].edit(content = newMessage)
+                        except:
+                            i = 0
                         raceMessages.pop(raceTemp)
                         await CheckRaceTimes(races)
                         return
@@ -413,7 +450,7 @@ async def CheckCommentatorPings():
             raceDataList = race.data.split(',')
             if len(raceDataList) > 3:
                 message = '%s needed in 1 hour for %s vs %s' % (commentatorPing, raceDataList[1], raceDataList[3])
-                await raceMessages[race].channel.send(message)
+                await raceMessages[race].channel.send(content = message, delete_after = timerAfterMessageToDelete)
                 race.commentatorPinged = True
 
 async def CheckRestreamerPings():
@@ -424,8 +461,25 @@ async def CheckRestreamerPings():
             raceDataList = race.data.split(',')
             if len(raceDataList) > 3:
                 message = '%s needed in 1 hour for %s vs %s' % (restreamerPing, raceDataList[1], raceDataList[3])
-                await raceMessages[race].channel.send(message)
+                await raceMessages[race].channel.send(content = message, delete_after = timerAfterMessageToDelete)
                 race.restreamerPinged = True
+
+async def CheckPeoplePing():
+    for race in raceMessages:
+        secondsUntilGMT  = GetTimeDifferenceFromGMT(race.raceTime)
+        print(secondsUntilGMT)
+        if secondsUntilGMT < peoplePingTime and not race.peoplePinged:
+            print('pinging people')
+            message = ''
+            for people in race.peopleToPing:
+                print(people.name)
+                message += people.mention
+            raceDataList = race.data.split(',')
+            message +=  '\n%s vs %s is starting in an hour' % (raceDataList[1], raceDataList[3])
+            print(message)
+            race.peoplePinged = True
+            await raceMessages[race].channel.send(content = message, delete_after = timerAfterMessageToDelete)
+
 
 ########################ACTUAL CODE##############################
 load_dotenv()
@@ -466,7 +520,7 @@ async def CheckSharcordRaces():
     return await CheckRaces(sharcordSheet, raceDataSampleRange, commentatorsSampleRange, sharcordTxtFile, sharcordChannel, True, False)
 
 async def CheckTournamentSharcordRaces():
-    return await CheckRaces(sharcordSheet, tournamentDataSampleRange, tournamentCommentatorDataSampleRange, tournamentTxtFile, sharcordChannel, True, False)
+    return await CheckRaces(sharcordSheet, tournamentDataSampleRange, tournamentCommentatorDataSampleRange, tournamentTxtFile, testChannel, True, False)
 
 async def CheckTestSharcordRaces():
     return await CheckRaces(testSheet, raceDataSampleRange, commentatorsSampleRange, sharcordTxtFile, testChannel, True, False)
@@ -482,15 +536,16 @@ async def Main():
     while(True):
         #print(GetRaceTime('20/05/21 | 9:00PM GMT'))
         tournamentRaces = await CheckTournamentSharcordRaces()
-        sharcordRaces = await CheckTestSharcordRaces()
-        chessRaces = await CheckTestChessRaces()
+        #sharcordRaces = await CheckTestSharcordRaces()
+        #chessRaces = await CheckTestChessRaces()
 
         await CheckRaceTimes(tournamentRaces)
-        await CheckRaceTimes(chessRaces)
-        await CheckRaceTimes(sharcordRaces)
+        #await CheckRaceTimes(chessRaces)
+        #await CheckRaceTimes(sharcordRaces)
 
         await CheckCommentatorPings()
         await CheckRestreamerPings()
+        await CheckPeoplePing()
         time.sleep(10)
 
 
@@ -522,6 +577,13 @@ async def on_message(message):
 
     if 'boat jump' in message.content and 'help' in message.content:
         await message.channel.send('https://media.discordapp.net/attachments/580364471130783744/843613945235505182/image0.png')
+
+@client.event
+async def on_reaction_add(reaction, user):
+    print("on reaction")
+    for race in raceMessages:
+        if reaction.message == raceMessages[race]:
+            race.peopleToPing.append(user)
 
 client.run(TOKEN)
     
