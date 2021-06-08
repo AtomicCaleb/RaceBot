@@ -35,11 +35,13 @@ class Race:
     row = 0
     commentators = []
     restreamer = ''
-    runnerTimes = 'null, null'
+    runnerTimes = 'No Time Entered, No Time Entered'
     peopleToPing = []
     commentatorPinged = False
     restreamerPinged = False
     peoplePinged = False
+    raceMessage = ''
+    messageID = ''
 
 sharcordRaces = []
 tournamentRaces = []
@@ -466,6 +468,7 @@ async def CheckRestreamerPings():
 
 async def CheckPeoplePing():
     for race in raceMessages:
+        print(race.peopleToPing)
         secondsUntilGMT  = GetTimeDifferenceFromGMT(race.raceTime)
         print(secondsUntilGMT)
         if secondsUntilGMT < peoplePingTime and not race.peoplePinged:
@@ -583,7 +586,18 @@ async def on_reaction_add(reaction, user):
     print("on reaction")
     for race in raceMessages:
         if reaction.message == raceMessages[race]:
-            race.peopleToPing.append(user)
+            try:
+                race.peopleToPing.index(user)
+            except:   
+                print('adding to list')
+                race.peopleToPing.append(user)
+            
+@client.event
+async def on_reaction_remove(reaction, user):
+    print("on reaction remove")
+    for race in raceMessages:
+        if reaction.message == raceMessages[race]:
+            race.peopleToPing.remove(user)
 
 client.run(TOKEN)
     
