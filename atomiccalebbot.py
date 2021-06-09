@@ -33,7 +33,6 @@ class Race:
     def __init__(self):
         self.data = ''
         self.time = ''
-        self.row = 0
         self.commentators = []
         self.restreamer = ''
         self.runnerTimes = 'No Time Entered, No Time Entered'
@@ -43,6 +42,7 @@ class Race:
         self.peoplePinged = False
         self.message = ''
         self.messageID = ''
+        self.removed = False
 
 
 sharcordRaces = []
@@ -61,7 +61,7 @@ chessTestTxtFile = 'testChessRaces.txt'
 
 # The ID and range of a sample spreadsheet.
 raceDataSampleRange = '\'SHAR Rival Races\'!A2:G'
-commentatorsSampleRange = '\'SHAR Rival Races\'!A2:M'
+commentatorsSampleRange = '\'SHAR Rival Races\'!A3:L'
 tournamentDataSampleRange = '\'SHAR 2021 ASM Tourney\'!A2:G'
 tournamentCommentatorDataSampleRange = '\'SHAR 2021 ASM Tourney\'!A2:M'
 chessDataSampleRange = '\Sheet1!A2:E'
@@ -265,6 +265,7 @@ def CompareRaces(races, txtFile, hasCategory, chess):
             newRace = Race()
             scheduledRaces.append(newRace)
             newRace.message = GetMessageString(fileRace, False, hasCategory, chess)
+            newRace.removed = True
 
     i = 0
     #check the race data agaisnt the file
@@ -454,8 +455,8 @@ async def CheckCommentatorPings():
         if(secondsUntilGMT < commentatorPingTime and not race.commentatorPinged and len(race.commentators) < 2):
             raceDataList = race.data.split(',')
             if len(raceDataList) > 3:
-                message = '%s needed in 1 hour for %s vs %s' % (commentatorPing, raceDataList[1], raceDataList[3])
-                await scheduledRaces[race].messageID.channel.send(content = message, delete_after = timerAfterMessageToDelete)
+                message = '%s needed in 1 hour for %s vs %s' % (commentatorPing, raceDataList[2], raceDataList[3])
+                await race.messageID.channel.send(content = message, delete_after = timerAfterMessageToDelete)
                 race.commentatorPinged = True
 
 async def CheckRestreamerPings():
@@ -465,7 +466,7 @@ async def CheckRestreamerPings():
         if(secondsUntilGMT < restreamerPingTime and not race.restreamerPinged and not race.restreamer):
             raceDataList = race.data.split(',')
             if len(raceDataList) > 3:
-                message = '%s needed in 1 hour for %s vs %s' % (restreamerPing, raceDataList[1], raceDataList[3])
+                message = '%s needed in 1 hour for %s vs %s' % (restreamerPing, raceDataList[2], raceDataList[3])
                 await race.messageID.channel.send(content = message, delete_after = timerAfterMessageToDelete)
                 race.restreamerPinged = True
 
@@ -508,7 +509,9 @@ async def CheckRaces(sheet, sampleRange, comsSampleRange, txtFile, channel, hasC
                 print(chunk)
                 #update the message ID
                 race.messageID = await client.get_channel(channel).send(chunk)
-                await race.messageID.add_reaction('\N{eyes}')
+                if not race.removed:
+                    await race.messageID.add_reaction('📣')
+                
                 empty = False
     #if its empty print for debug
     if empty:
