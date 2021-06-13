@@ -89,7 +89,7 @@ commentatorPing = '<@&596968452565106688>'
 restreamerPingTime = 3600
 restreamerPing = '<@&697846193400840343>'
 
-peoplePingTime = 3600
+peoplePingTime = 900
 
 #####################FUNCTIONS################################
 def GetTimeDifferenceFromGMT(secondsSinceGMT):
@@ -245,7 +245,7 @@ def GetMessageString(raceInfo, added, hasCategory, chess):
      return raceString
 
 
-def CompareRaces(races, txtFile, hasCategory, chess):
+async def CompareRaces(races, txtFile, hasCategory, chess):
     #get both datas
     with open(txtFile) as f:
         fileRaces = f.readlines()
@@ -267,6 +267,11 @@ def CompareRaces(races, txtFile, hasCategory, chess):
             newRace.message = GetMessageString(fileRace, False, hasCategory, chess)
             newRace.removed = True
 
+            #find the appropiate race and delete the message
+            for race in scheduledRaces:
+                if race.data + '\n' == fileRace:
+                    await race.messageID.edit(delete_after = 0)
+
     i = 0
     #check the race data agaisnt the file
     for race in races:
@@ -279,6 +284,8 @@ def CompareRaces(races, txtFile, hasCategory, chess):
 
 async def UpdateCommentators(race, newCommentators):
     print('updating commentators')
+    race.commentators = newCommentators 
+
     messageContent = ''
     messageContent = race.messageID.content
     
@@ -302,11 +309,11 @@ async def UpdateCommentators(race, newCommentators):
         await race.messageID.edit(content = newMessage)
     except:
         i = 0
-    race.commentators = newCommentators 
     return race
         
 async def UpdateRestreamer(race, restreamer):
     print('updating restreamer')
+    race.restreamer = restreamer
     #get the message contents
     content = race.messageID.content
     contentLines = content.split('\n')
@@ -364,7 +371,7 @@ async def CheckCommentators(races, sampleRange, sheet, hasCategory):
     #go through every scheduled race we have sent
     for race in scheduledRaces:
         #reset newcommentators ready for next part
-        newCommentators.clear()
+        newCommentators = []
         #if its a part of the current set
         for i in range(len(raceValues) - 1):
             count = 0
@@ -377,8 +384,8 @@ async def CheckCommentators(races, sampleRange, sheet, hasCategory):
                 #races[races.index(race)].runnerTimes.clear()
                 race.runnerTimes = runnerValues[i]
                 #add the restreamer
-                race.restreamer = restreamValues[i]
-                await UpdateRestreamer(race, restreamValues[i])
+                if race.restreamer != restreamValues[i]:
+                    await UpdateRestreamer(race, restreamValues[i])
                 commentators = comsValues[i]
                 #split up the commentators found
                 commentatorsSplit = commentators.split('/')
@@ -391,8 +398,20 @@ async def CheckCommentators(races, sampleRange, sheet, hasCategory):
             print(commentator)
         if len(newCommentators) < 1:
             continue
+
+        if len(race.commentators) > 1:
+            print('new coms: ' + newCommentators[0] + 'old coms: ' + race.commentators[0])
         
-        await UpdateCommentators(race, newCommentators)
+        if len(newCommentators) > len(race.commentators):
+            race = await UpdateCommentators(race, newCommentators)
+        elif len(race.commentators) > 1 and len(newCommentators) > 1:
+            if newCommentators[0] != race.commentators[0] or newCommentators[1] != race.commentators[1]:
+                race = await UpdateCommentators(race, newCommentators)
+        elif len(race.commentators) > 0:
+            if newCommentators[0] != race.commentators[0]:
+                race = await UpdateCommentators(race, newCommentators)
+
+            
 #        if race in races:
 #            print('race in races')
 #            #if it is update commentators
@@ -484,7 +503,7 @@ async def CheckPeoplePing():
                 if people.name != 'AtomicCalebBot':
                     message += people.mention
             raceDataList = race.data.split(',')
-            message +=  '\n%s vs %s is starting in an hour' % (raceDataList[2], raceDataList[3])
+            message +=  '\n%s vs %s is starting in 15 mins!' % (raceDataList[2], raceDataList[3])
             print(message)
             race.peoplePinged = True
             await race.messageID.channel.send(content = message, delete_after = timerAfterMessageToDelete)
@@ -498,7 +517,7 @@ client = discord.Client(activity=discord.Game(name='https://github.com/AtomicCal
 #client.run(TOKEN)
 async def CheckRaces(sheet, sampleRange, comsSampleRange, txtFile, channel, hasCategory, chess):
     races = GetRaceData(sheet, sampleRange, hasCategory)
-    changes = CompareRaces(races, txtFile, hasCategory, chess)
+    changes = await CompareRaces(races, txtFile, hasCategory, chess)
     WriteRacesToFile(races, txtFile)
     empty = True
     #go through every change
