@@ -21,12 +21,13 @@ import time
 import os
 import os.path
 import discord
+import asyncio
 
 
 ##########################VARIABLES#################
 # If modifying these scopes, delete the file token.json.
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly']
-
+intents = discord.Intents.all()
 
 #race data stuff
 class Race:
@@ -80,7 +81,7 @@ sharcordSheet = '1HB6LujCo6R2XeIVrWYdAZ8gQkA7qWrTF9QQlAWblizY'
 chessSheet = '1QAFp_BOB1j_0v_8S6ubhAITvKZru0mcZv_amgvpbbYc'
 
 #Race Message Stuff
-timeAfterRaceToDelete = 7200
+timeAfterRaceToDelete = 10800
 timerAfterMessageToDelete = 10800 
 
 commentatorPingTime = 3600
@@ -123,7 +124,7 @@ def GetRaceTime(timeString):
 
     #if its BST add an hour
     if tzString == 'BST':
-        newTime -= 3600
+        newTime -= 0
 
     return newTime
 
@@ -213,8 +214,10 @@ def GetRaceData(sheet, sampleRange, hasCategory):
                     raceData.row = values.index(row)
             try:    
                 raceData.time = GetRaceTime(row[dateTime])
-            except:
-                i = 0
+
+            except Exception as e:
+                print('handling exception')
+                print(e)
                 #print(row[dateTime] + ' not a valid raceTime')
             
             raceDatas.append(raceData)
@@ -270,7 +273,9 @@ async def CompareRaces(races, txtFile, hasCategory, chess):
             #find the appropiate race and delete the message
             for race in scheduledRaces:
                 if race.data + '\n' == fileRace:
-                    await race.messageID.edit(delete_after = 0)
+                    await race.messageID.edit(delete_after = 1)
+                    race.messageID = ''
+                    scheduledRaces.remove(race)
 
     i = 0
     #check the race data agaisnt the file
@@ -284,8 +289,6 @@ async def CompareRaces(races, txtFile, hasCategory, chess):
 
 async def UpdateCommentators(race, newCommentators):
     print('updating commentators')
-    race.commentators = newCommentators 
-
     messageContent = ''
     messageContent = race.messageID.content
     
@@ -307,8 +310,11 @@ async def UpdateCommentators(race, newCommentators):
     
     try:
         await race.messageID.edit(content = newMessage)
-    except:
-        i = 0
+
+    except Exception as e:
+        print('handling exception:')
+        print(e)
+    race.commentators = newCommentators 
     return race
         
 async def UpdateRestreamer(race, restreamer):
@@ -328,8 +334,9 @@ async def UpdateRestreamer(race, restreamer):
         newMessage += contentLine + '\n'
     try:
         await race.messageID.edit(content = newMessage)
-    except:
-        i = 0
+
+    except Exception as e:
+        print(e)
 
 async def CheckCommentators(races, sampleRange, sheet, hasCategory):
     #get all values from the sheet
@@ -398,9 +405,6 @@ async def CheckCommentators(races, sampleRange, sheet, hasCategory):
             print(commentator)
         if len(newCommentators) < 1:
             continue
-
-        if len(race.commentators) > 1:
-            print('new coms: ' + newCommentators[0] + 'old coms: ' + race.commentators[0])
         
         if len(newCommentators) > len(race.commentators):
             race = await UpdateCommentators(race, newCommentators)
@@ -410,8 +414,6 @@ async def CheckCommentators(races, sampleRange, sheet, hasCategory):
         elif len(race.commentators) > 0:
             if newCommentators[0] != race.commentators[0]:
                 race = await UpdateCommentators(race, newCommentators)
-
-            
 #        if race in races:
 #            print('race in races')
 #            #if it is update commentators
@@ -423,50 +425,56 @@ async def CheckCommentators(races, sampleRange, sheet, hasCategory):
 
 async def CheckRaceTimes(races):
     #for each message we have sent
-    for raceTemp in scheduledRaces:
-        for race in races:
-            if race.data == raceTemp.data:
-                if race.time:
-                    secondsUntilGMT = GetTimeDifferenceFromGMT(race.time) 
-                    if secondsUntilGMT < -timeAfterRaceToDelete:
-                        raceData = race.data.split(',')
-                        runnerOne = len(raceData) - 1
-                        runnerTwo = len(raceData) - 2
-                        #get the time delta to compare
-                        winner = 0 # 0 = tie, 1 = runner one win, 2 = runner two win
-                        runnerTimes = race.runnerTimes.split(',')
-                        runnerOneList = runnerTimes[0].split(':')
-                        runnerTwoList = runnerTimes[1].split(':')
-                        #if its a single digit use highest
-                        if(len(runnerOneList) == 1):
-                            if runnerOneList[0] != runnerTwoList[0]:
-                                winner = 1 if runnerOneList[0] > runnerTwoList[0] else 2
-                        #otherwise loop through them to find lowest
-                        else:
-                            for i in range(len(runnerOneList)):
-                                if runnerOneList[i] < runnerTwoList[i]:
-                                    winner = 1
-                                    break
-                                elif runnerOneList[i] > runnerTwoList[i]:
-                                    winner = 2 
-                                    break
-                        newMessage = ''
-                        winnerTime = runnerTimes[0] if winner == 1 else runnerTimes[1]
-                        loserTime = runnerTimes[1] if winner == 1 else runnerTimes[0]
-                        winnerName = raceData[runnerOne] if winner == 2 else raceData[runnerTwo]
-                        loserName = raceData[runnerTwo] if winner == 2 else raceData[runnerOne]
-                        category = raceData[1] if len(raceData) < 5 or winnerName == raceData[2] or winnerName == raceData[4] else 'Tournament Race'
-                        if winner == 0:
-                            newMessage = '**Race Completed** (%s)\n%s [%s] (TIE!)\n%s [%s] (TIE!)' % (category, raceData[runnerOne], runnerTimes[0], raceData[runnerTwo], runnerTimes[1])
-                        else:
-                            newMessage = '**Race Completed** (%s)\n%s [%s] (Winner!)\n%s [%s]' % (category, winnerName, winnerTime, loserName, loserTime)
-                        try:
-                            await raceTemp.messageID.edit(content = newMessage)
-                        except:
-                            i = 0
-                        scheduledRaces.pop(raceTemp)
-                        await CheckRaceTimes(races)
-                        return
+    try:
+        for race in scheduledRaces:
+            if race.time:
+                secondsUntilGMT = GetTimeDifferenceFromGMT(race.time) 
+                if secondsUntilGMT < -timeAfterRaceToDelete:
+                    print('updating finished race')
+                    raceData = race.data.split(',')
+                    runnerOne = len(raceData) - 1
+                    runnerTwo = len(raceData) - 2
+                    #get the time delta to compare
+                    winner = 0 # 0 = tie, 1 = runner one win, 2 = runner two win
+                    runnerTimes = race.runnerTimes.split(',')
+                    runnerOneList = runnerTimes[0].split(':')
+                    runnerTwoList = runnerTimes[1].split(':')
+                    #if its a single digit use highest
+                    if(len(runnerOneList) == 1):
+                        if runnerOneList[0] != runnerTwoList[0]:
+                            winner = 1 if runnerOneList[0] > runnerTwoList[0] else 2
+                    #otherwise loop through them to find lowest
+                    else:
+                        for i in range(len(runnerOneList)):
+                            if runnerOneList[i] < runnerTwoList[i]:
+                                winner = 1
+                                break
+                            elif runnerOneList[i] > runnerTwoList[i]:
+                                winner = 2 
+                                break
+                    newMessage = ''
+                    print(runnerTimes)
+                    winnerTime = runnerTimes[0] if winner == 1 else runnerTimes[1]
+                    loserTime = runnerTimes[1] if winner == 1 else runnerTimes[0]
+                    winnerName = raceData[runnerOne] if winner == 2 else raceData[runnerTwo]
+                    loserName = raceData[runnerTwo] if winner == 2 else raceData[runnerOne]
+                    category = raceData[1] if len(raceData) < 5 or winnerName == raceData[2] or winnerName == raceData[4] else 'Tournament Race'
+                    if winner == 0:
+                        newMessage = '**Race Completed** (%s)\n%s [%s] (TIE!)\n%s [%s] (TIE!)' % (category, raceData[runnerOne], runnerTimes[0], raceData[runnerTwo], runnerTimes[1])
+                    else:
+                        newMessage = '**Race Completed** (%s)\n%s [%s] (Winner!)\n%s [%s]' % (category, winnerName, winnerTime, loserName, loserTime)
+                    try:
+                        await race.messageID.edit(content = newMessage)
+                    except Exception as e:
+                        print('handling exception:')
+                        print(e)
+                    scheduledRaces.remove(race)
+                    await CheckRaceTimes(races)
+                    return
+    except Exception as e:
+        print('handling exception:')
+        print(e)
+
 async def CheckCommentatorPings():
     for race in scheduledRaces:
         secondsUntilGMT = GetTimeDifferenceFromGMT(race.time)
@@ -509,39 +517,45 @@ async def CheckPeoplePing():
             await race.messageID.channel.send(content = message, delete_after = timerAfterMessageToDelete)
 
 
+
+
 ########################ACTUAL CODE##############################
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 
-client = discord.Client(activity=discord.Game(name='https://github.com/AtomicCaleb/RaceBot'))
+client = discord.Client(activity=discord.Game(name='https://github.com/AtomicCaleb/RaceBot'), intents = intents)
 #client.run(TOKEN)
 async def CheckRaces(sheet, sampleRange, comsSampleRange, txtFile, channel, hasCategory, chess):
-    races = GetRaceData(sheet, sampleRange, hasCategory)
-    changes = await CompareRaces(races, txtFile, hasCategory, chess)
-    WriteRacesToFile(races, txtFile)
-    empty = True
-    #go through every change
-    for race in scheduledRaces:
-        if race.message and not race.messageID:
-            for chunk in Chunks(race.message, 2000):
-                #print the change
-                print(chunk)
-                #update the message ID
-                race.messageID = await client.get_channel(channel).send(chunk)
-                if not race.removed:
-                    await race.messageID.add_reaction('📣')
-                
-                empty = False
-    #if its empty print for debug
-    if empty:
-        print('no new races for ' + txtFile)
+    try:
+        races = GetRaceData(sheet, sampleRange, hasCategory)
+        changes = await CompareRaces(races, txtFile, hasCategory, chess)
+        WriteRacesToFile(races, txtFile)
+        empty = True
+        #go through every change
+        for race in scheduledRaces:
+            if race.message and not race.messageID:
+                for chunk in Chunks(race.message, 2000):
+                    #print the change
+                    print(chunk)
+                    #update the message ID
+                    race.messageID = await client.get_channel(channel).send(chunk)
+                    if not race.removed:
+                        await race.messageID.add_reaction('📣')
 
-    races = await CheckCommentators(races, comsSampleRange, sheet, hasCategory)
+                    empty = False
+        #if its empty print for debug
+        if empty:
+            print('no new races for ' + txtFile)
 
-    return races
+        races = await CheckCommentators(races, comsSampleRange, sheet, hasCategory)
 
-#Dict<Race, string>
-#List<Race>
+        return races
+
+    except Exception as e: 
+        print('handling exception:')
+        print(e)
+
+
 async def CheckSharcordRaces():
     return await CheckRaces(sharcordSheet, raceDataSampleRange, commentatorsSampleRange, sharcordTxtFile, sharcordChannel, True, False)
 
@@ -561,18 +575,18 @@ async def CheckTestChessRaces():
 async def Main():
     while(True):
         #print(GetRaceTime('20/05/21 | 9:00PM GMT'))
-        tournamentRaces = await CheckTournamentSharcordRaces()
-        #sharcordRaces = await CheckTestSharcordRaces()
+        #tournamentRaces = await CheckTournamentSharcordRaces()
+        sharcordRaces = await CheckTestSharcordRaces()
         #chessRaces = await CheckTestChessRaces()
 
-        await CheckRaceTimes(tournamentRaces)
+        #await CheckRaceTimes(tournamentRaces)
         #await CheckRaceTimes(chessRaces)
-        #await CheckRaceTimes(sharcordRaces)
+        await CheckRaceTimes(sharcordRaces)
 
         await CheckCommentatorPings()
         await CheckRestreamerPings()
         await CheckPeoplePing()
-        time.sleep(10)
+        await asyncio.sleep(5)
 
 
 def Chunks(s, n):
@@ -600,32 +614,49 @@ async def on_message(message):
     if 'chess races' in message.content:
         for chunk in Chunks(chessRaces, 2000):
             await message.channel.send(chunk)
-
-    if 'boat jump' in message.content and 'help' in message.content:
+    
+    #boat jump reply
+    if ('boat jump' in message.content or 'Boat Jump' in message.content) and ('help' in message.content or 'guide' in message.content):
         await message.channel.send('https://media.discordapp.net/attachments/580364471130783744/843613945235505182/image0.png')
 
+    if 'glgl' in message.content or 'Glgl' in message.content or 'GLGL' in message.content:
+        await message.add_reaction('🇬')
+        await message.add_reaction('🇱')
+
+    if ('game' in message.content or 'Game' in message.content or 'shar' in message.content or 'SHAR' in message.content) and ('get' in message.content  or 'where' in message.content):
+        await message.channel.send("<#217719373152911361>")
+
 @client.event
-async def on_reaction_add(reaction, user):
+async def on_raw_reaction_add(payload):
     print("on reaction")
-    for race in scheduledRaces:
-        if reaction.message == race.messageID:
-            print(reaction.me)
-            if not user in race.peopleToPing:
-                print('adding to list')
-                race.peopleToPing.append(user)
-            
+    try:
+        for race in scheduledRaces:
+            if race.messageID:
+                if payload.message_id == race.messageID.id:
+                    user = await client.fetch_user(payload.user_id)
+                    if not user in race.peopleToPing:
+                        print('adding to list')
+                        race.peopleToPing.append(user)
+    except Exception as e:
+        print('handling exception:')
+        print(e)
+
 @client.event
 async def on_raw_reaction_remove(payload):
-    print("on reaction remove")
-    for race in scheduledRaces:
-        print(payload.message_id)
-        if payload.message_id == race.messageID.id:
-            print(payload.user_id)
-            for user in race.peopleToPing:
-                if user.id == payload.user_id:
-                    race.peopleToPing.remove(user)
-                    print(race.peopleToPing)
-                    return;
-
+    try:
+        print("on reaction remove")
+        for race in scheduledRaces:
+            if race.messageID:
+                print(payload.message_id)
+                if payload.message_id == race.messageID.id:
+                    print(payload.user_id)
+                    for user in race.peopleToPing:
+                        if user.id == payload.user_id:
+                            race.peopleToPing.remove(user)
+                            print(race.peopleToPing)
+                            return;
+    except Exception as e:
+        print('handling exception:')
+        print(e)
 client.run(TOKEN)
     

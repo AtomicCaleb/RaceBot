@@ -1,22 +1,9 @@
-06/05/21 | 1:00AM BST,ASM,BeingofUniverse,crazytonedog
-17/05/21 | 9:00PM GMT,ASM until 4-6 (No CSS),dylrsmith,Moleman
-20/05/21 | 11:30AM GMT,ASM Console,AtomicCaleb,Ticker
-20/05/21 | 9:00PM BST,ASM,DerekRuns,ducbob
-31/05/21 | 9:00PM BST,ASM,ducbob,Moleman
-01/06/21 | 1:30AM GMT,ASM,DerekRuns,ducbob
-02/06/21 | 12:44AM BST,ASM,DerekRuns,ducbob
-01/06/21 | 12:44AM GMT,ASM,DerekRuns,ducbob
-01/06/21 | 12:44AM GMT,ASM,notpenis,ducbob
-20/05/21 | 11:30AM GMT,newrace,notpenis,test2
-20/05/21 | 11:30AM GMT,test,notpenis,test1
-20/05/21 | 11:30AM GMT,test,runner 1,runner 2
-20/05/21 | 11:30AM GMT,test,Runner 1,Runner 2
-31/05/22 | 10:00PM GMT,ASM,ducbob,Moleman
-06/05/21 | 1:00AM BST,ASM,BeingofUniverse,crazytonedog
-17/05/21 | 9:00PM GMT,ASM until 4-6 (No CSS),dylrsmith,Moleman
-14/04/21 | 11:30AM GMT,ASM,ducbob,Bulmers
-25/04/22 | 11:00AM GMT,NMW,Caleb,Critch
-02/06/21 | 2:00PM GMT,asd,asdasd,asdasd
-06/05/21 | 12:00AM BST,ASM,BeingofUniverse,crazytonedog
-05/06/21 | 5:35AM GMT,ASM,BeingofUniverse,crazytonedog
-end,end,end,end
+11/06/21 | 2:00PM BST,Skinner,Caleb,Tyfuzzle
+11/06/21 | 7:00PM BST,Willie,Being,Horoc
+11/06/21 | 10:00PM BST,Lisa,Luke_runs,00tylerp
+12/06/21 | 2:00AM BST,Lisa,Falco,Kabel
+12/06/21 | 1:00PM BST,Burns,Ticker,Tillbert
+12/06/21 | 7:00PM BST,Milhouse,haz,LP3Cinema
+12/06/21 | 10:00PM BST,Lisa,Falco,Luke_runs
+13/06/21 | 12:00AM BST,Marge,Guff,Greeny 
+15/06/21 | 10:45AM BST,test,test,test
