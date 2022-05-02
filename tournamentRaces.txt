@@ -21,7 +21,7 @@
 15/06/21 | 4:00PM BST,Kang,Greenbulmers,AskJT
 15/06/21 | 7:00PM BST,Marge,Guff,Baconman12
 15/06/21 | 9:00PM BST,Kang,Derek,Sid
-16/06/21 | 12:00AM BST,Marge,Greeny ,Baconman12
+16/06/21 | 12:00AM BST,Marge,Greeny,Baconman12
 16/06/21 | 2:00AM BST,Krusty,Gordo,Timbs
 16/06/21 | 12:00PM BST,Apu,Owlman,Zoton2
 16/06/21 | 4:00PM BST,Bart,12_Kelvin,Spear
@@ -30,66 +30,154 @@
 17/06/21 | 12:00AM BST,Homer,Slater,BasedJonesy
 17/06/21 | 10:00AM BST,Otto,Quimby,crazytonedog
 17/06/21 | 1:00PM BST,Homer,Slater,Haus
-17/06/21 | 6:30PM BST,Wiggum,Lobsterdoo,Spam78
 17/06/21 | 10:00PM BST,Skinner,ducbob,Ben___
 18/06/21 | 10:00AM BST,Lisa,Luke_runs,Kabel
 18/06/21 | 1:00PM BST,Skinner,Caleb,ducbob
-18/06/21 | 4:00PM BST,Otto,Potato,Spruce
 18/06/21 | 10:00PM BST,Lisa,Falco,00tylerp
+19/06/21 | 7:00AM BST,Skinner,Caleb,Ben___
 19/06/21 | 9:00AM BST,Burns,Tillbert ,slendbed
 19/06/21 | 11:00AM BST,Apu,Cricket,Larrakin
 19/06/21 | 1:30PM BST,Krusty,Gordo,Tophat
 19/06/21 | 5:00PM BST,Milhouse,finness,LP3Cinema
+19/06/21 | 7:00PM BST,Krusty,Tophat,Timbs
 19/06/21 | 11:00PM BST,Wiggum,Lobsterdoo,Thermalsquare
 20/06/21 | 1:00AM BST,Smithers,Varelity,djlambton
+20/06/21 | 5:00AM BST,Otto,Potato,crazytonedog
 20/06/21 | 10:00AM BST,Otto,Spruce,crazytonedog
 20/06/21 | 1:00PM BST,Wiggum,Lachycorn,Thermalsquare
 20/06/21 | 4:00PM BST,Homer,Jonesy,Haus
-20/06/21 | 9:00PM BST,Kang,Derek,Greenbulmers
-20/06/21 | 11:00PM BST,Milhouse,finness,Bamford
-21/06/21 | 2:00PM BST,Burns,dylrsmith,Ticker
+21/06/21 | 4:00PM BST,Otto,Potato,Spruce
 21/06/21 | 6:00PM BST,Willie,Being,Luvny
 21/06/21 | 9:00PM BST,Smithers,Clifforus,djlambton
 21/06/21 | 11:00PM BST,Homer,Jonesy,Rughmar
 22/06/21 | 1:00PM BST,Smithers,Clifforus,nico_psd
-22/06/21 | 4:00PM BST,Maggie,Axey,Seasoner
+22/06/21 | 4:00PM BST,Maggie,Mikey,Seasoner
 22/06/21 | 7:00PM BST,Marge,Critch,Guff
 22/06/21 | 11:00PM BST,Wiggum,Towsen,Thermalsquare
+23/06/21 | 5:00AM BST,Otto,Quimby,Potato
 23/06/21 | 1:00PM BST,Krusty,jpecimage,TopHat
 23/06/21 | 4:00PM BST,Willie,LT,Luvny
 23/06/21 | 7:00PM BST,Burns,dylrsmith ,Tillbert13
-23/06/21 | 10:00PM BST,Maggie,Axey,Jokingbomb
-24/06/21 | 8:00AM BST,Krusty,jpecimage,Gordo
-24/06/21 | 12:00PM BST,Apu,Cricket,Owlman
+23/06/21 | 10:00PM BST,Maggie,Mikey,Jokingbomb
+24/06/21 | 12:00AM BST,Kang,Derek,Greenbulmers
+24/06/21 | 11:00AM BST,Apu,Owlman,Cricket
+24/06/21 | 3:00PM BST,Milhouse,Bamford,Finness
 24/06/21 | 5:00PM BST,Bart,12_Kelvin,Vapo
-24/06/21 | 9:00PM BST,Maggie,Techno,Jokingbomb
-25/06/21 | 7:00AM BST,Krusty,jpecimage,Timbs
+24/06/21 | 10:00PM BST,Maggie,Techno,Jokingbomb
 25/06/21 | 12:00AM BST,Wiggum,Towsen,Lachycorn
+25/06/21 | 9:00AM BST,Krusty,jpecimage,Timbs
 25/06/21 | 4:00PM BST,Willie,Luvny,Horoc
-25/06/21 | 9:00PM BST,Maggie,Axey,Techno
+25/06/21 | 6:30PM BST,Wiggum,Lobsterdoo,Spam
 26/06/21 | 12:00AM BST,Wiggum,Lobsterdoo,Lachycorn
-26/06/21 | 3:00AM BST,Milhouse,Bamford,LP3Cinema
-26/06/21 | 12:00PM BST,Wiggum,Spam,Lachycorn
 26/06/21 | 3:00PM BST,Wiggum,Spam,Thermalsquare
 26/06/21 | 5:00PM BST,Bart,Vapo,Spear
 26/06/21 | 10:00PM BST,Bart,12_Kelvin,KthRam
-27/06/21 | 8:00AM BST,Marge,Critch,Greeny 
-27/06/21 | 4:00PM BST,Maggie,Seasoner,Techno
+27/06/21 | 11:30AM BST,Wiggum,Spam,Lachycorn
+27/06/21 | 4:30PM BST,Maggie,Seasoner,Techno
 27/06/21 | 7:00PM BST,Milhouse,haz,Bamford
 27/06/21 | 10:00PM BST,Smithers,Varelity,nico_psd
-28/06/21 | 8:30PM BST,Kang,AskJT,Derek
-28/06/21 | 10:30PM BST,Burns,dylrsmith ,slendbed
+28/06/21 | 12:00PM BST,Krusty,jpecimage,Gordo
+28/06/21 | 2:00PM BST,Burns,dylrsmith,Ticker
+28/06/21 | 9:15PM BST,Kang,AskJT,Derek
 29/06/21 | 3:00PM BST,Smithers,djlambton,nico_psd
 29/06/21 | 8:00PM BST,Maggie,Bregermann,Techno
 29/06/21 | 11:00PM BST,Bart,Spear,KthRam
 30/06/21 | 12:00PM BST,Apu,Zoton2,Cricket
-30/06/21 | 9:00PM BST,Maggie,Axey,Bregermann
+30/06/21 | 9:00PM BST,Maggie,Mikey,Bregermann
+01/07/21 | 1:00PM BST,Homer,Slater,Rughmar
 01/07/21 | 4:00PM BST,Willie,LT,Horoc
+01/07/21 | 7:00PM BST,Burns,dylrsmith,slendbed
 01/07/21 | 10:00PM BST,Wiggum,Towsen,Spam
 02/07/21 | 12:00AM BST,Maggie,Bregermann,jokingbomb
 02/07/21 | 4:00PM BST,Maggie,Bregermann,Seasoner
-02/07/21 | 10:00PM BST,Homer,Slater,Rughmar
+02/07/21 | 7:00PM BST,Maggie,Techno,Mikey
+03/07/21 | 3:00AM BST,Milhouse,Bamford,LP3Cinema
 03/07/21 | 5:00AM BST,Bart,Vapo,KthRam
-04/07/21 | 1:00PM BST,Homer,Haus,Rughmar
+04/07/21 | 6:00PM BST,Marge,Critch,Greeny 
+05/07/21 | 4:00PM BST,Homer,Haus,Rughmar
 05/07/21 | 8:30PM BST,Kang,AskJT,Sid
+09/07/21 | 12:00PM BST,Winners Round 1,Baconman12,Slater
+10/07/21 | 1:00PM BST,Winners Round 2,dylrsmith,jpecimage
+10/07/21 | 9:00PM BST,Winners Round 1,Sid3300,djlambton
+10/07/21 | 11:00PM BST,Winners Round 1,KthRam,Jonesy
+11/07/21 | 6:00PM BST,Winners Round 1,Mikey,Tillbert
+12/07/21 | 12:00PM BST,Winners Round 2,Caleb,Spruce
+12/07/21 | 3:00PM BST,Winners Round 2,AskJT,12_Kelvin
+13/07/21 | 7:00PM BST,Winners Round 2,Greenbulmers ,Spear 
+13/07/21 | 10:15PM BST,Winners Round 2,Guff,Slendbed
+14/07/21 | 5:00AM BST,Winners Round 2,Quimby,Bamford
+14/07/21 | 9:00PM BST,Winners Round 1,Tyfuzzle,Falco
+15/07/21 | 4:00AM BST,Winners Round 1,crazytonedog,BeingofUniverse
+16/07/21 | 7:00PM BST,Winners Round 1,Tophat,Cricket
+16/07/21 | 11:00PM BST,Winners Round 2,KthRam,Critch
+17/07/21 | 8:00AM BST,Winners Round 2,Greeny,Timbs
+17/07/21 | 3:00PM BST,Winners Round 2,haz,Baconman12
+17/07/21 | 7:00PM BST,Winners Round 1,LP3Cinema,Towsen
+17/07/21 | 9:00PM BST,Winners Round 2,ducbob,Tillbert
+18/07/21 | 2:00PM BST,Winners Round 2,Ticker,Sid3300
+18/07/21 | 8:00PM BST,Winners Round 2,Derek,Tophat
+20/07/21 | 8:00PM BST,Losers Round 1,Baconman12,Falco
+21/07/21 | 12:00PM BST,Winners Round 2,Gordo,Tyfuzzle
+21/07/21 | 10:00PM BST,Winners Round 2,finness,Ben___
+22/07/21 | 2:00AM BST,Winners Round 2,PotatoOnCrack,BeingofUniverse
+22/07/21 | 11:30PM BST,Losers Round 1,KthRam,Mikey
+23/07/21 | 9:00PM BST,Winners Round 3,12_Kelvin,ducbob
+24/07/21 | 4:30AM BST,Winners Round 2,Vapo,Towsen
+24/07/21 | 1:30PM BST,Losers Round 2,Baconman12,jpecimage
+25/07/21 | 9:00PM BST,Winners Round 3,haz,dylrsmith
+26/07/21 | 6:00PM BST,Losers Round 1,Jonesy,Tillbert
+26/07/21 | 10:00PM BST,Losers Round 1,crazytonedog,Sid3300
+27/07/21 | 8:00PM BST,Winners Round 3,Greenbulmers ,Critch
+28/07/21 | 1:00AM BST,Losers Round 1,BeingofUniverse,djlambton
+28/07/21 | 8:00AM BST,Winners Round 3,Gordo,Quimby
+29/07/21 | 9:00PM BST,Losers Round 1,Cricket,Towsen
+30/07/21 | 9:00AM BST,Winners Round 3,Vapo,Slendbed
+01/08/21 | 8:00PM BST,Losers Round 2,Finness,BeingofUniverse
+01/08/21 | 11:00PM BST,Losers Round 2,Spear,KthRam
+02/08/21 | 9:00AM BST,Losers Round 2,Timbs,Sid3300
+03/08/21 | 9:00PM BST,Losers Round 2,Guff,Cricket
+03/08/21 | 11:00PM BST,Winners Round 3,PotatoOnCrack,Ben___
+04/08/21 | 9:00AM BST,Winners Quarterfinals,Gordo,Vapo
+04/08/21 | 11:30AM BST,Winners Round 3,Ticker,Greeny
+04/08/21 | 9:00PM BST,Winners Round 3,Derek,Spruce
+05/08/21 | 11:00AM BST,Losers Round 2,Bamford,Tyfuzzle
+05/08/21 | 7:00PM BST,Losers Round 3,Critch,Tillbert
+05/08/21 | 9:00PM BST,PET Bracket Round 1,zoton2,bregermann
+06/08/21 | 10:00AM BST,Winners Quarterfinals,Ticker,Greenbulmers
+06/08/21 | 1:00PM BST,Losers Round 3,Baconman12,Quimby
+09/08/21 | 12:00PM BST,Losers Round 3,Greeny,Finness
+09/08/21 | 4:30PM BST,Losers Round 2,AtomicCaleb,Tophat
+10/08/21 | 10:00AM BST,PET Bracket Round 1,Lachycorn,Larrakin 
+10/08/21 | 10:00PM BST,Losers Round 3,Timbs,Ben___
+11/08/21 | 2:30PM BST,Losers Round 3,Slendbed,AtomicCaleb
+11/08/21 | 8:00PM BST,Losers Round 3,Spruce,Cricket
+12/08/21 | 9:00PM BST,PET Bracket Round 2,Luke_runs,zoton2
+15/08/21 | 2:00PM BST,Losers Round 3,haz,Bamford
+16/08/21 | 10:30AM BST,Losers Round 4,Quimby,Slendbed
+16/08/21 | 6:00PM BST,Losers Round 3,Kelvin,Spear 
+17/08/21 | 6:30PM BST,Losers Round 4,Critch,Finness
+18/08/21 | 5:00PM BST,Winners Quarterfinals,PotatoOnCrack,ducbob
+19/08/21 12:00PM BST ,PET Bracket Round 2,Varelity,00tylerpYT
+19/08/21 | 5:30PM BST,Winners Quarterfinals,Derek,dylrsmith
+20/08/21 | 8:00PM BST,PET Bracket Round 2,ThermalSquare,Clifforus
+22/08/21 10:00AM BST,PET Bracket Round 3,Varelity,Luke_runs
+24/08/21 | 9:00PM BST,Losers Round 5,Critch,ducbob
+25/08/21 | 11:00AM BST,PET Bracket Round 3,Clifforus,Larrakin
+25/08/21 | 9:00PM BST,Losers Round 4,haz,Spruce
+26/08/21 | 11:00AM BST,PET 3rd Place Match,Luke_runs,Larrakin 
+28/08/21 | 1:00PM BST,Losers Round 5,Gordo,haz
+28/08/21 | 3:00PM BST,PET Bracket Grand Final,Varelity,Clifforus
+28/08/21 | 11:00PM BST,Losers Round 4,Timbs,Kelvin
+29/08/21 | 1:00AM BST,Losers Round 5,Timbs,Greenbulmers
+01/09/21 | 1:00PM BST,Winners Semifinals,dylrsmith,Ticker
+01/09/21 | 8:00PM BST,Losers Round 6,Critch,haz
+03/09/21 | 9:30AM BST,Losers Round 6,Greenbulmers,Quimby
+10/09/21 | 9:00PM BST,Winners Semifinals,Vapo,PotatoOnCrack
+12/09/21 | 1:00PM BST,Losers Quarterfinals,Ticker,haz
+12/09/21 | 2:30PM BST,Winners Finals,dylrsmith,Vapo
+20/09/21 | 10:00PM BST,Losers Quarterfinals,PotatoOnCrack,Greenbulmers
+25/09/21 | 1:00PM BST,Losers Semifinals,Greenbulmers,haz
+02/10/21 | 8:00PM BST,Losers Final,Vapo,haz
+04/10/21 | 8:00PM BST,Grand Final,dylrsmith,Vapo
+06/10/21 | 7:00PM BST,Ultimate Grand Final,dylrsmith,Vapo
 enD,end,END,end

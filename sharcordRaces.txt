@@ -1,9 +1,45 @@
-11/06/21 | 2:00PM BST,Skinner,Caleb,Tyfuzzle
-11/06/21 | 7:00PM BST,Willie,Being,Horoc
-11/06/21 | 10:00PM BST,Lisa,Luke_runs,00tylerp
-12/06/21 | 2:00AM BST,Lisa,Falco,Kabel
-12/06/21 | 1:00PM BST,Burns,Ticker,Tillbert
-12/06/21 | 7:00PM BST,Milhouse,haz,LP3Cinema
-12/06/21 | 10:00PM BST,Lisa,Falco,Luke_runs
-13/06/21 | 12:00AM BST,Marge,Guff,Greeny 
-15/06/21 | 10:45AM BST,test,test,test
+Date/Time,Category,Runner 1,Runner 2
+06/11/21 | 7:00PM GMT,ASM vs NMW,Baconman12,Tillbert
+16/11/21 | 9:30PM GMT,All Story Missions,LCplFalco,00tylerpYT
+20/11/21 | 6:00PM GMT,All Story Missions,Axington123,crazytonedog
+16/12/21 | 7:00PM GMT,All Story Missions,Baconman12,BeingofUniverse
+17/12/21 | 10:00PM GMT,Rewards Rando,QUALIFIER,QUALIFIER
+18/12/2021 | 4:30AM GMT,Rewards Rando,Greeny0359,BeingofUniverse
+18/12/2021 | 12:00PM GMT,Rewards Rando,Ticker,Luke_runs
+18/12/2021 | 8:00PM GMT,Rewards Rando,Guff,Spruce
+18/12/21 | 9:00PM GMT,Rewards Rando,Baconman12,KthRam
+19/12/21 | 10:00AM GMT,Rewards Rando,Ticker,KthRam
+20/12/21 | 11:00AM GMT,Rewards Rando,Greeny0359,Spruce
+20/12/21 | 8:00PM GMT,All Story Missions,Luke_runs,00tylerpYT
+21/12/2021 | 11:00AM GMT,Rewards Rando,Ticker,Spruce
+16/1/2022 | 9:00PM GMT,All Tasks NLR,LCplFalco,iGTP
+20/1/2022 | 7:00PM GMT,All Spoon Missions,The dylrsmith,Crltch
+25/1/2022 | 7:00PM GMT,Seeded Rando,Critch,BeingofUniverse
+04/02/2022 | 7:00PM GMT,Cheat%,Baconman12,BeingofUniverse
+04/02/22 | 9:30PM GMT,Cheat%,finness,LCplFalco
+05/2/22 | 12:00PM GMT,Cheat%,Vapo,Tillbert
+05/2/22 | 10:30PM GMT,Cheat%,finness,crazytonedog
+06/02/22 | 9:00AM GMT,Cheat%,Vapo,Baconman12
+06/02/22 | 9:00PM GMT,Cheat%,Baconman12,finness
+10/02/22 | 3:00PM GMT,Cheat%,Vapo,crazytonedog
+20/02/22 | 3:00PM GMT,All Tasks NLR,Tillbert,LCplFalco
+21/02/22 | 9:30PM GMT,All Story Missions,Critch,crazytonedog
+24/02/22 | 9:00PM GMT,All Story Missions,00tylerpYT,crazytonedog
+07/03/22 | 7:00PM GMT,Blackout Bingo,Shibarianne,00tylerp
+08/03/22 | 11:00AM GMT,Blackout Bingo,Eszq,Larrakin
+08/03/22 | 8:00PM GMT,Blackout Bingo,Greenbulmers,LCplFalco
+08/03/22 | 10:00PM GMT,Blackout Bingo,Shibarianne,Vapo
+08/03/22 | 11:00PM GMT,Blackout Bingo,BeingofUniverse,Greenbulmers
+10/03/22 | 12:00PM GMT,Blackout Bingo,Baconman12,Eszq
+10/03/22 | 8:00PM GMT,Blackout Bingo,choripanycristi,crazytonedog
+10/03/22 | 10:00PM GMT,Blackout Bingo,Greenbulmers,crazytonedog
+11/03/22 | 8:00PM GMT,Blackout Bingo,Baconman12,Vapo
+12/03/22 | 8:00PM GMT,Blackout Bingo (2 out of 3),Baconman12,Greenbulmers
+13/03/22 | 3:00PM GMT,Blackout Bingo,Vapo,crazytonedog
+25/03/22 | 8:00PM GMT,All Tasks,Seasoner,Spruce
+23/04/22 | 11:00PM GMT,All Story Missions,KthRam,Sid3300
+30/04/22 | 2:00PM BST,2V2 Blackout bingo (2 of 3),Vapo/Axey,Ticker/Bulmers
+08/05/22 | 10:00PM GMT,Family Sedan %,Sid3300,TheLouieCopeland/Lobster?
+time,Lockout Bingo (2 out of 3),Critch,Axington123
+end,end,end,end
+

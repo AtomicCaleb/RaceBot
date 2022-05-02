@@ -29,6 +29,8 @@ import asyncio
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly']
 intents = discord.Intents.all()
 
+debugMode = True
+
 #race data stuff
 class Race:
     def __init__(self):
@@ -51,6 +53,8 @@ tournamentRaces = []
 chessRaces = []
 scheduledRaces = []
 
+#meeee
+atomicCalebID = 89942265400688640
 
 #text files
 sharcordTxtFile = 'sharcordRaces.txt'
@@ -61,15 +65,15 @@ chessTestTxtFile = 'testChessRaces.txt'
 
 
 # The ID and range of a sample spreadsheet.
-raceDataSampleRange = '\'SHAR Rival Races\'!A2:G'
-commentatorsSampleRange = '\'SHAR Rival Races\'!A3:L'
+raceDataSampleRange = 'SHAR Rival Races 21/22'
+commentatorsSampleRange = '\'SHAR Rival Races 21/22\'!A3:L'
 tournamentDataSampleRange = '\'SHAR 2021 ASM Tourney\'!A2:G'
 tournamentCommentatorDataSampleRange = '\'SHAR 2021 ASM Tourney\'!A2:M'
 chessDataSampleRange = '\Sheet1!A2:E'
 chessCommentatorDataSampleRange = 'Sheet1!A2:K'
 
 #channels
-sharcordChannel = 847495184660955146
+sharcordChannel = 961608530723504199
 chessChannel = 827714631714734160
 testChannel = 382486010417643530
 testChannelTwo = 848165475925229568
@@ -117,14 +121,31 @@ def GetRaceTime(timeString):
 
     #get the time now that we removed the timezone
     dateTimeFormat = '%d/%m/%y | %I:%M%p '
-    newTime = mktime(time.strptime(newTimeString, dateTimeFormat))
+    dateTimeFormatTwo = '%d/%m/%Y | %I:%M%p '
+    newTime = 0
+    try:
+        newTime = mktime(time.strptime(newTimeString, dateTimeFormat))
+    except:
+        try:
+            newtime = mktime(time.strptime(newTimeString, dateTimeFormatTwo))
+        except:
+            newTime = None
+            print(timeString)
+            print("Convertime time for ^ failed\n")
+
     #if it isnt a valid timzeone currently supported default to BST
     if not 'BST' in tzString and not 'GMT' in tzString:
         tzString = 'BST'
 
     #if its BST add an hour
     if tzString == 'BST':
-        newTime -= 0
+        newTime -= 3600
+
+    #if we arent running the server
+    if debugMode:
+        #do a little fixeroo cause idk why it does this 
+        newTime += 3600
+
 
     return newTime
 
@@ -137,6 +158,7 @@ def WriteExtrasToFile(races, fileName):
     with open(fileName, 'w') as f:
         for race in races:
             if race.commentators:
+                print("commentators:")
                 print(race.commentators)
             commentators = race.data
             for commentator in race.commentators:
@@ -144,27 +166,9 @@ def WriteExtrasToFile(races, fileName):
             commentators += '\n'
             f.write(commentators)
 
-def GetSheet(sheetToUse, sampleRange):
-    """Shows basic usage of the Sheets API.
-    Prints values from a sample spreadsheet."""
-    creds = None
-    # The file token.json stores the user's access and refresh tokens, and is
-    # created automatically when the authorization flow completes for the first
-    # time.
-    if os.path.exists('token.json'):
-        creds = Credentials.from_authorized_user_file('token.json', SCOPES)
-    # If there are no (valid) credentials available, let the user log in.
-    if not creds or not creds.valid:
-        if creds and creds.expired and creds.refresh_token:
-            creds.refresh(Request())
-        else:
-            flow = InstalledAppFlow.from_client_secrets_file('credentials.json', SCOPES)
-            creds = flow.run_local_server(port=0)
-        # Save the credentials for the next run
-        with open('token.json', 'w') as token:
-            token.write(creds.to_json())
+async def GetSheet(sheetToUse, sampleRange):
 
-    service = build('sheets', 'v4', credentials=creds)
+    service = build('sheets', 'v4', developerKey ="AIzaSyDvlRQLhPyVgnqrMyf2Y0PZGNsSox53rQ0")
 
     # Call the Sheets API
     sheet = service.spreadsheets()
@@ -172,8 +176,8 @@ def GetSheet(sheetToUse, sampleRange):
                                 range=sampleRange).execute()
     return result.get('values', [])
 
-def GetRaceData(sheet, sampleRange, hasCategory):
-    values = GetSheet(sheet, sampleRange)
+async def GetRaceData(sheet, sampleRange, hasCategory):
+    values = await GetSheet(sheet, sampleRange)
     raceDatas = []
     
     if not values:
@@ -216,9 +220,7 @@ def GetRaceData(sheet, sampleRange, hasCategory):
                 raceData.time = GetRaceTime(row[dateTime])
 
             except Exception as e:
-                print('handling exception')
-                print(e)
-                #print(row[dateTime] + ' not a valid raceTime')
+                print('not a proper time')
             
             raceDatas.append(raceData)
     return raceDatas
@@ -231,7 +233,7 @@ def GetMessageString(raceInfo, added, hasCategory, chess):
      #format it correctly
      if added:
          if hasCategory:
-            raceString += '**•Race Scheduled** \nDate/Time: %s \nGroup: %s \nRacers: %s VS %s\nCommentators: \nRestreamer: \n' % (raceInfoList[0], raceInfoList[1], raceInfoList[2], raceInfoList[3])
+            raceString += '**•Race Scheduled** \nDate/Time: %s \nCategory: %s \nRacers: %s VS %s\nCommentators: \nRestreamer: \n' % (raceInfoList[0], raceInfoList[1], raceInfoList[2], raceInfoList[3])
          elif not chess:
             raceString += '**•Tournament Race Scheduled**\nDate/Time:%s\nCategory: ASM \nRacers: %s VS %s\nCommentators: \nRestreamer: \n' % (raceInfoList[0],raceInfoList[1], raceInfoList[2])
          else:
@@ -340,7 +342,7 @@ async def UpdateRestreamer(race, restreamer):
 
 async def CheckCommentators(races, sampleRange, sheet, hasCategory):
     #get all values from the sheet
-    values = GetSheet(sheet, sampleRange)
+    values = await GetSheet(sheet, sampleRange)
     #set variables needed
     raceValueCount = 5 if hasCategory else 4
     commsValueCount = 7 if hasCategory else 6
@@ -398,6 +400,7 @@ async def CheckCommentators(races, sampleRange, sheet, hasCategory):
                 commentatorsSplit = commentators.split('/')
                 for split in commentatorsSplit:
                     newCommentators.append(split)
+                print("runner times: ")
                 print(race.runnerTimes)
             #print(count)
         #check everything is correct
@@ -500,7 +503,6 @@ async def CheckRestreamerPings():
 async def CheckPeoplePing():
     for race in scheduledRaces:
         secondsUntilGMT  = GetTimeDifferenceFromGMT(race.time)
-        print(secondsUntilGMT)
         if secondsUntilGMT < peoplePingTime and not race.peoplePinged:
             print('pinging people')
             message = ''
@@ -525,9 +527,10 @@ TOKEN = os.getenv('DISCORD_TOKEN')
 
 client = discord.Client(activity=discord.Game(name='https://github.com/AtomicCaleb/RaceBot'), intents = intents)
 #client.run(TOKEN)
+
 async def CheckRaces(sheet, sampleRange, comsSampleRange, txtFile, channel, hasCategory, chess):
     try:
-        races = GetRaceData(sheet, sampleRange, hasCategory)
+        races = await GetRaceData(sheet, sampleRange, hasCategory)
         changes = await CompareRaces(races, txtFile, hasCategory, chess)
         WriteRacesToFile(races, txtFile)
         empty = True
@@ -557,13 +560,13 @@ async def CheckRaces(sheet, sampleRange, comsSampleRange, txtFile, channel, hasC
 
 
 async def CheckSharcordRaces():
-    return await CheckRaces(sharcordSheet, raceDataSampleRange, commentatorsSampleRange, sharcordTxtFile, sharcordChannel, True, False)
+    return await CheckRaces(sharcordSheet, raceDataSampleRange, commentatorsSampleRange, sharcordTxtFile, testChannel, True, False)
 
 async def CheckTournamentSharcordRaces():
     return await CheckRaces(sharcordSheet, tournamentDataSampleRange, tournamentCommentatorDataSampleRange, tournamentTxtFile, testChannel, True, False)
 
 async def CheckTestSharcordRaces():
-    return await CheckRaces(testSheet, raceDataSampleRange, commentatorsSampleRange, sharcordTxtFile, testChannel, True, False)
+    return await CheckRaces(testSheet, raceDataSampleRange, commentatorsSampleRange, sharcordTxtFile, testChannelTwo, True, False)
 
 async def CheckChessRaces():
     return await CheckRaces(chessSheet, raceDataSampleRange, commentatorsSampleRange, chessTxtFile, chessChannel, False, True)
@@ -573,10 +576,13 @@ async def CheckTestChessRaces():
 
 
 async def Main():
+
+    #await client.get_channel(218790354936135680).send("'**•Race Scheduled** \nDate/Time: every day \nCategory: rent free zombieee \nRacers: AtomicCaleb VS Greeny\nCommentators: Ticker\nRestreamer: Hundo\n'")
     while(True):
+
         #print(GetRaceTime('20/05/21 | 9:00PM GMT'))
         #tournamentRaces = await CheckTournamentSharcordRaces()
-        sharcordRaces = await CheckTestSharcordRaces()
+        sharcordRaces = await CheckSharcordRaces()
         #chessRaces = await CheckTestChessRaces()
 
         #await CheckRaceTimes(tournamentRaces)
@@ -623,8 +629,12 @@ async def on_message(message):
         await message.add_reaction('🇬')
         await message.add_reaction('🇱')
 
-    if ('game' in message.content or 'Game' in message.content or 'shar' in message.content or 'SHAR' in message.content) and ('get' in message.content  or 'where' in message.content):
+    if ('game?' in message.content or 'Game?' in message.content or 'shar?' in message.content or 'SHAR?' in message.content) and ('get' in message.content  or 'where' in message.content):
         await message.channel.send("<#217719373152911361>")
+
+    if("!racesheet" in message.content or "!Racesheet" in messsage.content or "!RaceSheet" in message.content):
+        await message.channel.send("https://docs.google.com/spreadsheets/d/1HB6LujCo6R2XeIVrWYdAZ8gQkA7qWrTF9QQlAWblizY/edit#gid=1235898570")
+
 
 @client.event
 async def on_raw_reaction_add(payload):
