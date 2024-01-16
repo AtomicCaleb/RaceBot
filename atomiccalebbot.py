@@ -15,6 +15,8 @@ from google.oauth2.credentials import Credentials
 
 from time import gmtime
 from time import mktime
+from timeit import default_timer
+
 import datetime
 import time
 
@@ -55,6 +57,7 @@ scheduledRaces = []
 
 #meeee
 atomicCalebID = 89942265400688640
+memeTimer = 86400 # 1 day
 
 #text files
 sharcordTxtFile = 'sharcordRaces.txt'
@@ -77,6 +80,7 @@ sharcordChannel = 961608530723504199
 chessChannel = 827714631714734160
 testChannel = 382486010417643530
 testChannelTwo = 848165475925229568
+memeChannel = 218790354936135680
 
 #google sheets
 testSheet = '1IM24hRS_giIC5OcNNGBrHfwIZpbOcUyUURgt-q4913w'
@@ -520,6 +524,11 @@ async def CheckPeoplePing():
 
 
 
+async def MemePost(lastPost):
+    if(not lastPost):
+        return lastPost
+    
+        return lastPost
 
 ########################ACTUAL CODE##############################
 load_dotenv()
@@ -559,6 +568,7 @@ async def CheckRaces(sheet, sampleRange, comsSampleRange, txtFile, channel, hasC
         print(e)
 
 
+
 async def CheckSharcordRaces():
     return await CheckRaces(sharcordSheet, raceDataSampleRange, commentatorsSampleRange, sharcordTxtFile, testChannel, True, False)
 
@@ -577,21 +587,34 @@ async def CheckTestChessRaces():
 
 async def Main():
 
-    #await client.get_channel(218790354936135680).send("'**•Race Scheduled** \nDate/Time: every day \nCategory: rent free zombieee \nRacers: AtomicCaleb VS Greeny\nCommentators: Ticker\nRestreamer: Hundo\n'")
+    atomicCalebClient = await client.fetch_user(atomicCalebID)
+    await atomicCalebClient.send("Bot Started")
+    lastMemePost = time.time() - memeTimer
+    dayCount = 1
+    print(lastMemePost)
     while(True):
+        timer = time.time() - lastMemePost 
+        print(timer)
+        if(timer > memeTimer):
+            #with open('homermuumuumap.webp', 'rb') as fp:
+            #    await client.get_channel(testChannel).send(file=discord.File(fp, 'new_filename.png'))
+            await client.get_channel(memeChannel).send("day " + str(dayCount) + " of posting this meme until critch comes back")
+            await client.get_channel(memeChannel).send("https://media.discordapp.net/attachments/218790354936135680/1191274935998480425/homermuumuumap.jpg?ex=65b74d3d&is=65a4d83d&hm=06ac58e75f9c32c7cbec572756c40cebfc30f444dd52bba53a9a9aaecc0c6ed7&=&format=webp")      
+            lastMemePost = time.time()
+            dayCount +=1
 
         #print(GetRaceTime('20/05/21 | 9:00PM GMT'))
         #tournamentRaces = await CheckTournamentSharcordRaces()
-        sharcordRaces = await CheckSharcordRaces()
+#        sharcordRaces = await CheckSharcordRaces()
         #chessRaces = await CheckTestChessRaces()
 
         #await CheckRaceTimes(tournamentRaces)
         #await CheckRaceTimes(chessRaces)
-        await CheckRaceTimes(sharcordRaces)
+#        await CheckRaceTimes(sharcordRaces)
 
-        await CheckCommentatorPings()
-        await CheckRestreamerPings()
-        await CheckPeoplePing()
+#        await CheckCommentatorPings()
+#        await CheckRestreamerPings()
+#        await CheckPeoplePing()
         await asyncio.sleep(5)
 
 
@@ -603,6 +626,7 @@ def Chunks(s, n):
 @client.event
 async def on_ready():
     print(f'{client.user} has connected to Discord!')
+    lastMemePost = time.time()
     await Main()
 
 @client.event
@@ -621,6 +645,10 @@ async def on_message(message):
         for chunk in Chunks(chessRaces, 2000):
             await message.channel.send(chunk)
     
+    if ('boat jump' in message.content or 'Boat Jump' in message.content or 'Boat jump' in message.content):
+        await message.channel.send('<@89942265400688640>')
+
+
     #boat jump reply
     if ('boat jump' in message.content or 'Boat Jump' in message.content) and ('help' in message.content or 'guide' in message.content):
         await message.channel.send('https://media.discordapp.net/attachments/580364471130783744/843613945235505182/image0.png')
@@ -632,7 +660,7 @@ async def on_message(message):
     if ('game?' in message.content or 'Game?' in message.content or 'shar?' in message.content or 'SHAR?' in message.content) and ('get' in message.content  or 'where' in message.content):
         await message.channel.send("<#217719373152911361>")
 
-    if("!racesheet" in message.content or "!Racesheet" in messsage.content or "!RaceSheet" in message.content):
+    if("!racesheet" in message.content or "!Racesheet" in message.content or "!RaceSheet" in message.content):
         await message.channel.send("https://docs.google.com/spreadsheets/d/1HB6LujCo6R2XeIVrWYdAZ8gQkA7qWrTF9QQlAWblizY/edit#gid=1235898570")
 
 
